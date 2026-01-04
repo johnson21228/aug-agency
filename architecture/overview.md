@@ -13,6 +13,8 @@ The system is intentionally layered to ensure that:
 - agency precedes execution
 - privacy is structural, not policy-based
 
+Continuity is realized in a persisted non-semantic substrate (the **Continuity Atlas**) and accessed through a defined interface and protocol (**CAP — Continuity Access Protocol**).
+
 The architecture supports multiple interfaces and applications, including IAM, without embedding application logic into the substrate.
 
 ## Design Principles
@@ -28,5 +30,6 @@ The architecture supports multiple interfaces and applications, including IAM, w
 - `levels/` — vertical architecture from numeric continuity to human autonomy
 - `comparison/` — contrasts with alternative AI architectures
 - `ingestion-pipeline.md` — how inputs enter the system
+- `lui-capture-layer.md` — source-of-record for explicit language inputs
 
 This architecture is designed to evolve without collapsing layers.
