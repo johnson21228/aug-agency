@@ -1,8 +1,8 @@
 # LUI Capture Layer (Source-of-Record)
 
-This document defines the LUI Capture Layer: the persistent, addressable record of explicit human-generated language inputs (LUIs) and related events.
+This document defines the LUI Capture Layer: the persistent, addressable record of explicit language–user inputs (LUIs) and related events.
 
-This layer is the non-optional foundation that enables CAP (Continuity Atlas / Continuity Assurance Plane) and IAM services.
+This layer is the non-optional foundation that enables the Continuity Atlas (substrate), the CAP (Continuity Access Protocol), and IAM services.
 
 Chunking and semantic assistance are optional overlays and are not required for continuity correctness.
 
@@ -12,7 +12,7 @@ Chunking and semantic assistance are optional overlays and are not required for 
 
 The LUI Capture Layer exists to:
 
-- preserve explicit human language acts as durable events,
+- preserve explicit language acts as durable events,
 - assign stable identifiers suitable for longitudinal reference,
 - maintain ordering without semantic interpretation,
 - retain provenance so sources can be audited and re-entered,
@@ -55,18 +55,23 @@ This is not semantics. It is structural traceability.
 
 ---
 
-## Relationship to CAP
+## Relationship to CAP (Continuity Access Protocol)
 
-CAP operates over LUI event identifiers.
+CAP defines the **interface and protocol** by which continuity structures in the Atlas are accessed, navigated, and referenced.
 
-CAP constructs continuity structures such as:
+CAP operates over LUI identifiers and Atlas metadata. It does not store data and does not infer meaning.
 
-- return points (pointers to `lui_id` or ranges),
-- regions/charts (sets or intervals of LUIs),
-- adjacency links (prev/next in time),
-- stitching edges (links between regions).
+Through CAP, permitted operations may include:
 
-CAP does not require meaning to preserve continuity. It requires stable, addressable events.
+- referencing LUI identifiers or ranges,
+- navigating temporal adjacency,
+- resolving return points,
+- traversing regions or charts,
+- following stitching links.
+
+CAP governs access.  
+The Atlas stores continuity.  
+Meaning emerges only through human re-entry.
 
 ---
 
@@ -74,13 +79,13 @@ CAP does not require meaning to preserve continuity. It requires stable, address
 
 IAM is the user-facing interface and thinking support layer.
 
-IAM services depend on the LUI Capture Layer and CAP to enable:
+IAM services depend on the LUI Capture Layer, the Atlas, and CAP to enable:
 
 - re-entry into prior activity without reconstruction,
 - user-authored return points and regions,
 - longitudinal navigation across sessions.
 
-IAM does not expose the substrate as a primary feature; the substrate exists to provide structural assurance that the space can be trusted.
+IAM does not expose the substrate or protocol as primary features; they exist to provide structural assurance that the space can be trusted.
 
 ---
 
@@ -90,7 +95,7 @@ Chunking, topic boundaries, summaries, and other semantic constructs may be comp
 
 Overlays MUST be:
 
-- separable from the LUI Capture Layer,
+- separable from the LUI Capture Layer and Atlas,
 - versioned and replaceable,
 - non-authoritative for continuity correctness.
 
