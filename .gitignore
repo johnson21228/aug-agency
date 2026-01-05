@@ -1,38 +1,97 @@
+############################
+# macOS / Finder
+############################
 .DS_Store
-*.xcuserstate
-*.xccheckout
-*.xcscmblueprint
-DerivedData/
-build/
-.swiftpm/
+.AppleDouble
+.LSOverride
 
-# ======================================================
-# Archives / exports
-# ======================================================
-*.zip
+############################
+# General editor / temp
+############################
+*.log
+*.tmp
+*.temp
+*.swp
+*.swo
+*.bak
+*.orig
 
-# ======================================================
-# Data artifacts (NEVER COMMIT)
-# ======================================================
-data/
-
-# (belt-and-suspenders in case someone drops exports at root)
-chatgpt_export/
-
-# ======================================================
-# Generated artifacts
-# ======================================================
-artifacts/
-
-# ======================================================
-# Databases
-# ======================================================
-*.db
-*.sqlite
-*.sqlite3
-
-# ======================================================
-# Python cache
-# ======================================================
+############################
+# Python
+############################
 __pycache__/
 *.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+############################
+# SQLite / local data artifacts
+############################
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+
+############################
+# Repo-specific data (local only)
+############################
+data/inbox/
+data/inbox/**
+
+data/artifacts/
+data/artifacts/**
+
+############################
+# ChatGPT / LLM exports (raw)
+############################
+**/chatgpt_export/
+**/chatgpt-export-*/
+**/conversations.json
+**/chat.html
+**/group_chats.json
+**/shared_conversations.json
+**/message_feedback.json
+**/shopping.json
+**/sora.json
+**/user-*/
+
+############################
+# Images from exports (usually huge)
+############################
+**/chatgpt-export-*/*.png
+**/chatgpt-export-*/*.jpg
+**/chatgpt-export-*/*.jpeg
+**/chatgpt-export-*/*.webp
+
+############################
+# Xcode / Swift / Apple dev
+############################
+DerivedData/
+.build/
+.build-*/
+.swiftpm/
+
+**/*.xcuserdatad/
+**/*.xcuserdata/
+**/*.xcuserstate
+**/*.xcbkptlist
+
+*.xcarchive
+*.ipa
+*.dSYM
+*.dSYM.zip
+
+############################
+# Workspace noise
+############################
+.vscode/
+.idea/
+
+############################
+# Allow placeholders
+############################
+!.keep
