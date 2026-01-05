@@ -23,7 +23,7 @@ help:
 	@echo ""
 	@echo "Common commands:"
 	@echo "  make ingest        Ingest latest ChatGPT export into iam.db"
-	@echo "  make ingest-dry    Normalize + validate export only (no DB write)"
+	@echo "  make ingest-dry    Normalize + validate export only (no DB write)\n  make canonicalize  Rebuild message_canonical view"
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  make clean-data    Remove all local data artifacts (DANGEROUS)"
@@ -49,6 +49,14 @@ lui-packets:
 	  --mode final-human \
 	  --max-chars 24000 \
 	  --include-titles
+
+
+
+.PHONY: canonicalize
+
+# Rebuild deterministic per-message text and the canonical view (message_canonical)
+canonicalize:
+	$(PYTHON) tools/canonicalize_messages.py --db data/artifacts/iam.db
 
 # ------------------------------------------------------
 # Cleanup (local only, gitignored)

@@ -560,6 +560,88 @@ def repo_root_from_script_location() -> Path:
     # script is expected at code/ingest/ingest_chatgpt_export.py
     return Path(__file__).resolve().parents[2]
 
+
+def build_message_text_and_canonical_view(conn: sqlite3.Connection) -> None:
+    """Build deterministic message text and a canonical view.
+
+    Why:
+    - Some messages store their text in message_content_parts (multi-part content).
+    - Some rows have no parts at all (e.g., tool messages, redactions, placeholders).
+
+    Outcome:
+    - message_text: one row per message_row_id with either concatenated text or NULL.
+    - message_canonical: a stable view joining messages + message_text.
+
+    This is SAFE to re-run; it drops/recreates message_text and message_canonical each time.
+    """
+    cur = conn.cursor()
+    cur.executescript(
+        """
+        DROP VIEW IF EXISTS message_canonical;
+        DROP TABLE IF EXISTS message_text;
+
+        CREATE TABLE message_text (
+          message_row_id INTEGER PRIMARY KEY,
+          text           TEXT,
+          source         TEXT NOT NULL,   -- 'parts' | 'none'
+          char_count     INTEGER NOT NULL,
+          FOREIGN KEY(message_row_id) REFERENCES messages(id)
+        );
+        """
+    )
+
+    # 1) Build from parts (ordered concatenation)
+    cur.executescript(
+        """
+        INSERT INTO message_text (message_row_id, text, source, char_count)
+        SELECT
+          message_row_id,
+          GROUP_CONCAT(part_text, '') AS text,
+          'parts' AS source,
+          LENGTH(GROUP_CONCAT(part_text, '')) AS char_count
+        FROM (
+          SELECT message_row_id, part_index, part_text
+          FROM message_content_parts
+          ORDER BY message_row_id, part_index
+        )
+        GROUP BY message_row_id;
+
+        -- 2) For messages with no parts, create a deterministic NULL text row.
+        INSERT INTO message_text (message_row_id, text, source, char_count)
+        SELECT
+          m.id AS message_row_id,
+          NULL AS text,
+          'none' AS source,
+          0 AS char_count
+        FROM messages m
+        WHERE NOT EXISTS (
+          SELECT 1 FROM message_text mt WHERE mt.message_row_id = m.id
+        );
+
+        -- 3) Canonical view: always use message_text.text (never messages.text).
+        CREATE VIEW message_canonical AS
+        SELECT
+          m.id                AS message_row_id,
+          m.conversation_id,
+          m.node_id,
+          m.message_id,
+          m.parent_id,
+          m.role,
+          m.author_name,
+          m.create_time,
+          m.update_time,
+          m.content_type,
+          mt.text             AS text,
+          mt.source           AS text_source,
+          mt.char_count       AS text_char_count,
+          m.status,
+          m.metadata_json
+        FROM messages m
+        JOIN message_text mt
+          ON mt.message_row_id = m.id;
+        """
+    )
+
 def main() -> None:
     parser = argparse.ArgumentParser(description="Ingest ChatGPT export into SQLite DB (zip or folder).")
 
@@ -642,6 +724,11 @@ def main() -> None:
     # Ingest
     conn = connect_db(db_path)
     conv_count, msg_count = ingest_conversations_json(conn, conversations_obj)
+
+    # Post-ingest canonicalization (safe to rerun)
+    build_message_text_and_canonical_view(conn)
+
+    conn.commit()
     conn.close()
 
     print("Ingest complete.")
