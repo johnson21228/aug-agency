@@ -1,9 +1,9 @@
 # IAM Writings Index (Machine-Readable)
 #
 # PURPOSE
-# - This file is a continuity spine for writings.
-# - It provides stable identifiers, ordering, dependency links, and authority status.
-# - It is NOT a summary, interpretation, or semantic representation of the essays.
+# - Continuity spine for the writings corpus.
+# - Stable identifiers, ordering, dependency links, authority status.
+# - NOT a summary or semantic interpretation layer.
 #
 # EDIT / EVOLUTION RULES (append-only discipline)
 # 1) Do not delete entries.
@@ -13,27 +13,13 @@
 #    - keep the old entry
 #    - add a new entry with a new id
 #    - link them via relations: {type: renamed_from|supersedes|clarifies|extends}
-# 5) Do not overwrite published essays to force downstream alignment.
-#    Alignment flows downward: writings → architecture → embodiments → code.
-# 6) Authority is explicit:
-#    - authoritative: true means it is part of the governing writings set
-#    - drafts must remain authoritative: false until promoted
-# 7) Promotion requires:
+# 5) Promotion requires:
 #    - authoritative: true
 #    - status: published
 #    - inclusion in writing/INDEX.md (human-facing index)
 #
-# ID CONVENTION
-# - ids are stable, short, and never reused.
-# - recommended format: W-<slug>-<3-digit> (e.g., W-agency-001)
-#
-# TEMPORAL CONVENTION
-# - created: the date the writing entered this repo as a tracked artifact
-# - revised: optional, when a new writing explicitly supersedes/clarifies an earlier one
-#
 version: 1
 
-# Global policies for tooling / ingestion
 policies:
   append_only: true
   id_reuse: forbidden
@@ -47,60 +33,65 @@ policies:
     - code
     - data
 
-# Canonical registry of writings
-# Required fields per entry:
-# - id, path, title, status, authoritative, created
-# Optional fields:
-# - tags, depends_on, relations, notes
 writings:
-  - id: W-agency-001
-    path: writing/agency-in-an-age-of-agents.md
-    title: Agency in an Age of Agents
-    status: published          # published | draft | archived
+  - id: W-intro-000
+    path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.md
+    title: From Task Displacement to Judgment Scarcity
+    status: published
     authoritative: true
-    created: 2025-12-20
-    tags: [agency, agents, asymmetry, economics]
+    created: 2026-01-06
+    tags: [intro, economics, judgment, continuity]
     depends_on: []
     relations: []
     notes: >
-      Primary orientation essay. Establishes the motivating problem and stakes.
+      Introductory on-ramp grounded in labor-market structure and judgment.
 
-  - id: W-continuity-002
-    path: writing/continuity-inference-preservation-of-thought.md
-    title: Continuity, Inference, and the Preservation of Thought
+  - id: W-agency-001
+    path: writing/essays/agency-in-an-age-of-agents.md
+    title: Agency in an Age of Agents
+    status: published
+    authoritative: true
+    created: 2025-12-20
+    tags: [agency, agents, asymmetry]
+    depends_on: [W-intro-000]
+    relations: []
+    notes: >
+      Core orientation essay framing the stakes around agency and asymmetry.
+
+  - id: W-conditions-002
+    path: writing/essays/continuity-privacy-conditions-of-thought.md
+    title: Continuity, Privacy, and the Conditions of Thought
     status: published
     authoritative: true
     created: 2025-12-19
-    tags: [continuity, judgment, meaning, time]
+    tags: [continuity, privacy, cognition]
     depends_on: [W-agency-001]
     relations: []
     notes: >
-      Bridges cognitive continuity to system design constraints.
+      Establishes privacy and continuity as enabling conditions for sustained thought.
 
-  - id: W-structural-003
-    path: writing/structural-divergence-capital-labor.md
-    title: Structural Divergence, Capital, Labor
+  - id: W-middleclass-003
+    path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
+    title: Agency at Work, Middle Class, Cognitive Infrastructure
     status: published
     authoritative: true
     created: 2025-12-09
-    tags: [economics, capital, labor, structure]
-    depends_on: []
+    tags: [economics, middle-class, work, infrastructure]
+    depends_on: [W-intro-000]
     relations: []
     notes: >
-      Macro context: why individual cognitive leverage matters structurally.
+      Connects labor-market structure to the need for cognitive infrastructure.
 
-# Draft registry (optional)
-# Drafts are first-class artifacts but not authoritative by default.
-drafts:
-  # Example:
-  # - id: W-draft-004
-  #   path: writing/drafts/agents-without-continuity.md
-  #   title: Agents Without Continuity
-  #   status: draft
-  #   authoritative: false
-  #   created: 2026-01-06
-  #   tags: [agents, continuity, judgment]
-  #   depends_on: [W-continuity-002]
-  #   relations: []
-  #   notes: >
-  #     Candidate for promotion once stabilized.
+  - id: W-afterwork-004
+    path: writing/essays/AfterWorkAfterJudgement.md
+    title: After Work, After Judgment
+    status: published
+    authoritative: true
+    created: 2025-12-09
+    tags: [judgment, work, meaning]
+    depends_on: [W-agency-001, W-conditions-002]
+    relations: []
+    notes: >
+      Explores downstream implications once routine work is displaced and judgment becomes central.
+
+drafts: []

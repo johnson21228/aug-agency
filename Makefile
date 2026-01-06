@@ -77,3 +77,8 @@ clean-data:
 
 pack-md:
 	$(PYTHON) Tools/pack_md_repo.py
+
+.PHONY: site
+site:
+	$(PYTHON) -m pip install --quiet --upgrade markdown pyyaml
+	$(PYTHON) tools/build_site.py --out site

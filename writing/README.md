@@ -1,71 +1,50 @@
-# Writings
+# IAM Core
 
-This directory contains the **conceptual and normative foundation** of the IAM project.
+This repository is structured as a **writings → architecture → embodiment → optional code** system.
 
-The writings are not commentary, documentation, or marketing material.
-They articulate the core problems, stakes, and claims that the rest of the repository
-exists to operationalize.
+The unifying goal of this work is not to build a better AI system, but to preserve and extend **human reasoning continuity** in an environment increasingly shaped by automated and agentic systems.
 
-All downstream layers—architecture, patents, embodiments, and code—must remain
-consistent with the claims made here.
+## How to read this repository
 
-## Purpose of the writings
+This repository is designed to be read, not executed.
 
-The essays in this directory serve three roles:
+1. **Begin with the introductory essay**
+   Start with:
 
-1. **Problem definition**
-   They describe the structural pressures facing human judgment, agency, and continuity
-   in an environment increasingly shaped by automated and agentic systems.
+   - `writing/from-task-displacement-to-judgment-scarcity.md`
 
-2. **Normative constraints**
-   They define what outcomes are desirable, what tradeoffs are unacceptable,
-   and what the system explicitly should *not* become.
+   This essay provides a neutral, economic framing of the problem space, grounding the project in widely accepted analyses of labor-market polarization and the increasing economic importance of judgment.
 
-3. **Conceptual grounding**
-   They introduce concepts—continuity, judgment, temporal coherence, asymmetry—that
-   later appear in architectural invariants and system design.
+2. **Proceed to the core writings**
+   Continue with the remaining essays in `writing/`, which develop the concepts of agency, judgment, and continuity that motivate the system.
 
-If a downstream artifact contradicts a claim made in these writings,
-the downstream artifact is wrong.
+3. **Move to architecture**
+   Read `architecture/` to see how the claims made in the writings are translated into system invariants, layers, and pipelines.
 
-## How to read the writings
+4. **Consult patent materials**
+   Use `patent/` for legal crystallization, traceability, and protection of the same ideas.
 
-Readers new to the project should:
+5. **Review embodiments and code last**
+   Treat `embodiments/` and `code/` strictly as optional reductions to practice and feasibility demonstrations.
 
-1. Begin with the primary orientation essay(s), which frame the overall concern
-   around agency, judgment, and continuity.
-2. Proceed to essays that connect those concerns to inference, memory, and system design.
-3. Treat economic or structural essays as context-setting rather than implementation guides.
+Code is not authoritative. Architecture does not supersede the writings.
 
-The writings are intended to be read slowly and independently of the code.
+## Repository structure and authority
 
-## Relationship to other layers
+- `writing/` — normative and conceptual foundation; upstream design constraints and explanatory essays
+- `patent/` — provisional drafts, claims, and traceability
+- `architecture/` — system invariants and technical truth layer (levels, pipelines, comparisons)
+- `embodiments/` — worked examples and reduction-to-practice artifacts
+- `core-ontology/` — primitives, invariants, and shared glossary
+- `residue/` — prompts, schemas, and samples (redacted)
+- `code/` — non-authoritative prototypes (e.g., iOS ingestion app)
 
-- **Architecture (`architecture/`)**
-  Translates the claims in these writings into system invariants, layers, and protocols.
+## Authority and non-contradiction
 
-- **Patent materials (`patent/`)**
-  Express the same ideas in legal form, with traceability to both writings and architecture.
+All downstream layers—architecture, patents, embodiments, and code—must remain consistent
+with the claims made in the writings.
 
-- **Embodiments and code (`embodiments/`, `code/`)**
-  Demonstrate feasibility only. They are not authoritative.
+If a contradiction exists, it must be resolved **upward**.
+Lower layers adapt to higher layers, never the reverse.
 
-## Drafts and evolution
-
-If a `drafts/` subdirectory is present, it contains working material that may be incomplete
-or exploratory. Drafts do not supersede finalized essays unless explicitly promoted.
-
-No writing should be removed or rewritten to accommodate a downstream implementation.
-Evolution proceeds by addition, clarification, or explicit revision.
-
-## Scope and non-goals
-
-The writings do not attempt to:
-- Propose a general theory of intelligence
-- Compete with existing AI model architectures
-- Optimize for predictive accuracy or automation
-
-They are concerned specifically with the preservation and extension of **human reasoning
-continuity over time**.
-
-For repository-wide authority rules, see `MAP.md`.
+See `MAP.md` for explicit authority boundaries and evolution rules.
