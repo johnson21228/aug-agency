@@ -72,3 +72,8 @@ clean-data:
 	@read -p "Type 'yes' to continue: " confirm && [ "$$confirm" = "yes" ]
 	rm -rf data/inbox data/staging data/artifacts
 	@echo "Local data artifacts removed."
+
+.PHONY: pack-md
+
+pack-md:
+	$(PYTHON) Tools/pack_md_repo.py

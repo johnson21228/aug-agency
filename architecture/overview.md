@@ -1,35 +1,47 @@
 # Architecture Overview
 
-This directory describes the architectural structure of the augmented-agency system.
+The IAM architecture exists to operationalize the claims made in the writings.
+It is not an independent source of truth.
 
-The architecture is organized around a **continuity-first stack** that separates:
-- non-semantic structural substrates
-- semantic and reasoning layers
-- agent and interface layers
-- governance and autonomy constraints
+This architecture translates normative goals—preserving human reasoning continuity,
+judgment, and agency over time—into concrete system invariants and layers.
 
-The system is intentionally layered to ensure that:
-- continuity precedes semantics
-- agency precedes execution
-- privacy is structural, not policy-based
+## Architectural stance
 
-Continuity is realized in a persisted non-semantic substrate (the **Continuity Atlas**) and accessed through a defined interface and protocol (**CAP — Continuity Access Protocol**).
+The system is designed around continuity, not optimization.
 
-The architecture supports multiple interfaces and applications, including IAM, without embedding application logic into the substrate.
+- Continuity is treated as a first-class invariant.
+- Human judgment is preserved by maintaining temporal coherence of meaning.
+- The system resists flattening human thought into static embeddings or summaries.
 
-## Design Principles
+## Relationship to writings
 
-- Continuity before intelligence
-- Explicit input over inferred state
-- Re-entry over retrieval
-- Human agency over agent optimization
-- Layer separation over monolithic models
+All architectural decisions are downstream of the writings found in `writing/`.
 
-## Structure
+The writings define:
+- What problems matter
+- What tradeoffs are acceptable
+- What outcomes are explicitly rejected
 
-- `levels/` — vertical architecture from numeric continuity to human autonomy
-- `comparison/` — contrasts with alternative AI architectures
-- `ingestion-pipeline.md` — how inputs enter the system
-- `lui-capture-layer.md` — source-of-record for explicit language inputs
+The architecture answers only:
+- How those claims can be made operational
+- What invariants must hold for the system to remain aligned
 
-This architecture is designed to evolve without collapsing layers.
+## Layered structure
+
+The architecture is organized into levels, beginning with a numeric continuity substrate
+and extending through ingestion, temporal binding, and higher-order reasoning support.
+
+Each level:
+- Introduces constraints, not features
+- Preserves append-only semantics
+- Avoids rewriting or collapsing prior human expression
+
+## Non-goals
+
+This architecture is not intended to:
+- Maximize predictive accuracy
+- Replace human judgment
+- Serve as a general-purpose agent framework
+
+Any embodiment or code suggesting otherwise is misaligned.

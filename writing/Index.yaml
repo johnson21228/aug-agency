@@ -1,0 +1,106 @@
+# IAM Writings Index (Machine-Readable)
+#
+# PURPOSE
+# - This file is a continuity spine for writings.
+# - It provides stable identifiers, ordering, dependency links, and authority status.
+# - It is NOT a summary, interpretation, or semantic representation of the essays.
+#
+# EDIT / EVOLUTION RULES (append-only discipline)
+# 1) Do not delete entries.
+# 2) Do not reuse an id once assigned.
+# 3) Do not change an entry's id.
+# 4) Prefer not to change an entry's path. If a file is renamed/moved:
+#    - keep the old entry
+#    - add a new entry with a new id
+#    - link them via relations: {type: renamed_from|supersedes|clarifies|extends}
+# 5) Do not overwrite published essays to force downstream alignment.
+#    Alignment flows downward: writings → architecture → embodiments → code.
+# 6) Authority is explicit:
+#    - authoritative: true means it is part of the governing writings set
+#    - drafts must remain authoritative: false until promoted
+# 7) Promotion requires:
+#    - authoritative: true
+#    - status: published
+#    - inclusion in writing/INDEX.md (human-facing index)
+#
+# ID CONVENTION
+# - ids are stable, short, and never reused.
+# - recommended format: W-<slug>-<3-digit> (e.g., W-agency-001)
+#
+# TEMPORAL CONVENTION
+# - created: the date the writing entered this repo as a tracked artifact
+# - revised: optional, when a new writing explicitly supersedes/clarifies an earlier one
+#
+version: 1
+
+# Global policies for tooling / ingestion
+policies:
+  append_only: true
+  id_reuse: forbidden
+  delete_entries: forbidden
+  prefer_new_entries_over_mutation: true
+  authority_order:
+    - writing
+    - architecture
+    - patent
+    - embodiments
+    - code
+    - data
+
+# Canonical registry of writings
+# Required fields per entry:
+# - id, path, title, status, authoritative, created
+# Optional fields:
+# - tags, depends_on, relations, notes
+writings:
+  - id: W-agency-001
+    path: writing/agency-in-an-age-of-agents.md
+    title: Agency in an Age of Agents
+    status: published          # published | draft | archived
+    authoritative: true
+    created: 2025-12-20
+    tags: [agency, agents, asymmetry, economics]
+    depends_on: []
+    relations: []
+    notes: >
+      Primary orientation essay. Establishes the motivating problem and stakes.
+
+  - id: W-continuity-002
+    path: writing/continuity-inference-preservation-of-thought.md
+    title: Continuity, Inference, and the Preservation of Thought
+    status: published
+    authoritative: true
+    created: 2025-12-19
+    tags: [continuity, judgment, meaning, time]
+    depends_on: [W-agency-001]
+    relations: []
+    notes: >
+      Bridges cognitive continuity to system design constraints.
+
+  - id: W-structural-003
+    path: writing/structural-divergence-capital-labor.md
+    title: Structural Divergence, Capital, Labor
+    status: published
+    authoritative: true
+    created: 2025-12-09
+    tags: [economics, capital, labor, structure]
+    depends_on: []
+    relations: []
+    notes: >
+      Macro context: why individual cognitive leverage matters structurally.
+
+# Draft registry (optional)
+# Drafts are first-class artifacts but not authoritative by default.
+drafts:
+  # Example:
+  # - id: W-draft-004
+  #   path: writing/drafts/agents-without-continuity.md
+  #   title: Agents Without Continuity
+  #   status: draft
+  #   authoritative: false
+  #   created: 2026-01-06
+  #   tags: [agents, continuity, judgment]
+  #   depends_on: [W-continuity-002]
+  #   relations: []
+  #   notes: >
+  #     Candidate for promotion once stabilized.
