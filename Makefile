@@ -79,6 +79,12 @@ pack-md:
 	$(PYTHON) Tools/pack_md_repo.py
 
 .PHONY: site
+# Build local preview site (not committed)
 site:
-	$(PYTHON) -m pip install --quiet --upgrade markdown pyyaml
 	$(PYTHON) tools/build_site.py --out site
+
+.PHONY: site docs
+
+# Build GitHub Pages site (committed)
+docs:
+	$(PYTHON) tools/build_site.py --out docs
