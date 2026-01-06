@@ -1,10 +1,3 @@
-# The Limits of “Thinking Support” Without Continuity
-
-**ID:** W-llm-limits-005
-**Status:** published · authoritative
-**Created:** 2026-01-06
-
----
 
 ## The Limits of “Thinking Support” Without Continuity
 
