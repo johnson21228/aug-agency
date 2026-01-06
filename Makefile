@@ -135,23 +135,41 @@ docs: $(VENV_PYTHON)
 # ------------------------------------------------------
 
 SITE_REPO ?= ../augmented-agency-site
+SITE_BRANCH ?= main
+MSG ?= "Publish site updates"
 
-.PHONY: publish-site-status publish-site publish-site-commit
+.PHONY: publish-site-status sync-site commit-site push-site publish publish-site publish-site-commit
 
 publish-site-status:
 	@test -d "$(SITE_REPO)" || (echo "ERROR: SITE_REPO not found: $(SITE_REPO)"; exit 1)
 	@test -d "$(SITE_REPO)/.git" || (echo "ERROR: SITE_REPO is not a git repo (missing .git): $(SITE_REPO)"; exit 1)
 	@echo "OK: public site repo found at $(SITE_REPO)"
 
-# Build docs + sync into public repo (NO git operations)
-publish-site: docs publish-site-status
+# Sync only (NO git operations)
+sync-site: docs publish-site-status
 	rsync -av --delete --exclude .git docs/ "$(SITE_REPO)/"
 	@echo "Synced ./docs -> $(SITE_REPO)"
 
-# Build docs + sync + commit + push (one-command publish)
-publish-site-commit: publish-site
-	cd "$(SITE_REPO)" && \
-	  git add -A && \
-	  (git commit -m "Publish site" || true) && \
-	  git push
+# Commit in public repo (no-op if nothing changed)
+commit-site: sync-site
+	@cd "$(SITE_REPO)" && \
+	  git checkout "$(SITE_BRANCH)" >/dev/null 2>&1 || true && \
+	  if git status --porcelain | grep -q . ; then \
+	    git add -A && \
+	    git commit -m $(MSG) ; \
+	  else \
+	    echo "No changes to commit in site repo."; \
+	  fi
+
+# Push public repo (updates GitHub Pages)
+push-site: commit-site
+	@cd "$(SITE_REPO)" && git push origin "$(SITE_BRANCH)"
 	@echo "Published (GitHub Pages will update automatically)."
+
+# One-command publish: build -> sync -> commit -> push
+publish: push-site
+	@echo "Done."
+
+# Backwards-compatible target names
+publish-site: sync-site
+publish-site-commit: publish
