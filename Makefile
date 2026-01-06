@@ -28,6 +28,11 @@ help:
 	@echo "Maintenance:"
 	@echo "  make clean-data    Remove all local data artifacts (DANGEROUS)"
 	@echo ""
+	@echo "Site:"
+	@echo "  make site          Build local preview site (./site, not committed)"
+	@echo "  make docs          Build GitHub Pages site (./docs, committed)"
+	@echo "  make venv          Create/refresh .venv for site builder"
+	@echo ""
 
 # ------------------------------------------------------
 # Ingest ChatGPT export
@@ -38,10 +43,10 @@ ingest:
 
 ingest-dry:
 	$(PYTHON) code/ingest/ingest_chatgpt_export.py --dry-run
-	
+
 ingest-keep:
 	$(PYTHON) code/ingest/ingest_chatgpt_export.py --keep-staging
-	
+
 .PHONY: lui-packets
 
 .PHONY: lui-packets
@@ -58,7 +63,7 @@ fm-chunks:
 	  --reserve-chars 2000 \
 	  --include-titles \
 	  --clean
-	  
+
 # ------------------------------------------------------
 # Cleanup (local only, gitignored)
 # ------------------------------------------------------
@@ -78,16 +83,44 @@ clean-data:
 pack-md:
 	$(PYTHON) Tools/pack_md_repo.py
 
+
+# ======================================================
+# Site builder: project-local venv (so you don't need to
+# install PyYAML globally or activate anything manually)
+# ======================================================
+
+VENV        := .venv
+VENV_PYTHON := $(VENV)/bin/python
+VENV_PIP    := $(VENV)/bin/pip
+SITE_REQS   := tools/requirements.txt
+
+.PHONY: venv
+venv: $(VENV_PYTHON)
+	@echo "OK: venv ready at $(VENV)"
+
+$(VENV_PYTHON):
+	@echo "Creating venv at $(VENV) ..."
+	python3 -m venv $(VENV)
+	@echo "Upgrading pip ..."
+	$(VENV_PIP) install --upgrade pip
+	@echo "Installing site builder deps ..."
+	@if [ -f "$(SITE_REQS)" ]; then \
+		$(VENV_PIP) install -r "$(SITE_REQS)"; \
+	else \
+		$(VENV_PIP) install pyyaml; \
+	fi
+
+
 .PHONY: site
 # Build local preview site (not committed)
-site:
-	$(PYTHON) tools/build_site.py --out site
+site: $(VENV_PYTHON)
+	$(VENV_PYTHON) tools/build_site.py --out site
 
 .PHONY: site docs
 
 # Build GitHub Pages site (committed)
-docs:
-	$(PYTHON) tools/build_site.py --out docs
+docs: $(VENV_PYTHON)
+	$(VENV_PYTHON) tools/build_site.py --out docs
 
 
 # ------------------------------------------------------
