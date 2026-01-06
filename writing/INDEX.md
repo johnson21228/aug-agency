@@ -51,6 +51,15 @@ Judgment as temporally situated rather than stateless or transactional.
 Justifies append-only semantics and resistance to overwrite or summary collapse.
 
 ---
+### `claude-chatgpt-limits-for-thinking.md`
+**Establishes:**
+Why coherence-first “thinking support” systems (LLMs framed as thinking aids)
+are structurally incapable of supporting long-horizon continuity.
+
+**Why it matters:**
+Positions IAM as a continuity-preserving substrate rather than an inference
+or reasoning optimization system, and clarifies complementarity rather than
+competition with LLMs.
 
 ## Structural / economic context
 
