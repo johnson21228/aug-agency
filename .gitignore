@@ -95,3 +95,6 @@ DerivedData/
 # Allow placeholders
 ############################
 !.keep
+
+# Local data (exports, dbs, inbox)
+data/

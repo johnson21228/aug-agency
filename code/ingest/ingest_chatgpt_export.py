@@ -437,6 +437,18 @@ def connect_db(db_path: Path) -> sqlite3.Connection:
     conn.executescript(SCHEMA_SQL)
     return conn
 
+
+def clear_core_tables(conn: sqlite3.Connection) -> None:
+    """Delete all rows from core ingest tables so a run is deterministic/idempotent.
+
+    This is the safest default for full re-ingest from a fresh ChatGPT export.
+    """
+    conn.execute("PRAGMA foreign_keys = OFF;")
+    # Delete children first, then parents.
+    for tbl in ("message_content_parts", "messages", "conversations"):
+        conn.execute(f"DELETE FROM {tbl};")
+    conn.execute("PRAGMA foreign_keys = ON;")
+
 def upsert_conversation(conn: sqlite3.Connection, c: dict) -> None:
     conn.execute(
         """
@@ -652,6 +664,8 @@ def main() -> None:
     parser.add_argument("--db", type=str, default=None, help="Output SQLite DB path.")
     parser.add_argument("--keep-staging", action="store_true", help="Do not delete staging dir after ingest.")
     parser.add_argument("--dry-run", action="store_true", help="Normalize + validate only; do not ingest to DB.")
+    parser.add_argument("--append", action="store_true", help="Append/update without clearing existing DB tables first")
+    parser.add_argument("--no-canonicalize", action="store_true", help="Skip building message_text table and message_canonical view")
     args = parser.parse_args()
 
     repo_root = Path(args.repo_root).resolve() if args.repo_root else repo_root_from_script_location()
@@ -723,10 +737,17 @@ def main() -> None:
 
     # Ingest
     conn = connect_db(db_path)
+
+    # By default we do a full rebuild so results are deterministic and repeatable.
+    # Use --append if you intentionally want to keep/merge prior ingests.
+    if not args.append:
+        clear_core_tables(conn)
+
     conv_count, msg_count = ingest_conversations_json(conn, conversations_obj)
 
     # Post-ingest canonicalization (safe to rerun)
-    build_message_text_and_canonical_view(conn)
+    if not args.no_canonicalize:
+        build_message_text_and_canonical_view(conn)
 
     conn.commit()
     conn.close()

@@ -42,22 +42,23 @@ ingest-dry:
 ingest-keep:
 	$(PYTHON) code/ingest/ingest_chatgpt_export.py --keep-staging
 	
+.PHONY: lui-packets
+
+.PHONY: lui-packets
+
 lui-packets:
-	$(PYTHON) code/export/export_lui_packets.py \
-	  --db data/artifacts/iam.db \
-	  --out data/artifacts/lui_packets.jsonl \
-	  --mode final-human \
-	  --max-chars 24000 \
-	  --include-titles
+	$(PYTHON) code/export/export_lui_packets_stage1.py --db data/artifacts/iam.db --out data/artifacts/lui_packets.jsonl --mode final-human --max-chars 24000 --include-titles
 
-
-
-.PHONY: canonicalize
-
-# Rebuild deterministic per-message text and the canonical view (message_canonical)
-canonicalize:
-	$(PYTHON) tools/canonicalize_messages.py --db data/artifacts/iam.db
-
+.PHONY: fm-chunks
+fm-chunks:
+	$(PYTHON) code/export/chunk_lui_packets_for_fm.py \
+	  --in data/artifacts/lui_packets.jsonl \
+	  --out data/artifacts/fm_chunks \
+	  --target-chars 16000 \
+	  --reserve-chars 2000 \
+	  --include-titles \
+	  --clean
+	  
 # ------------------------------------------------------
 # Cleanup (local only, gitignored)
 # ------------------------------------------------------
