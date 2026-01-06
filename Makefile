@@ -88,3 +88,37 @@ site:
 # Build GitHub Pages site (committed)
 docs:
 	$(PYTHON) tools/build_site.py --out docs
+
+
+# ------------------------------------------------------
+# Publish docs -> public site repo (sibling checkout)
+#
+# IMPORTANT:
+# Run `make publish-site*` from the root of the private
+# `augmented-agency` repo.
+#
+# Assumes the public site repo exists at:
+#   ../augmented-agency-site
+# ------------------------------------------------------
+
+SITE_REPO ?= ../augmented-agency-site
+
+.PHONY: publish-site-status publish-site publish-site-commit
+
+publish-site-status:
+	@test -d "$(SITE_REPO)" || (echo "ERROR: SITE_REPO not found: $(SITE_REPO)"; exit 1)
+	@test -d "$(SITE_REPO)/.git" || (echo "ERROR: SITE_REPO is not a git repo (missing .git): $(SITE_REPO)"; exit 1)
+	@echo "OK: public site repo found at $(SITE_REPO)"
+
+# Build docs + sync into public repo (NO git operations)
+publish-site: docs publish-site-status
+	rsync -av --delete --exclude .git docs/ "$(SITE_REPO)/"
+	@echo "Synced ./docs -> $(SITE_REPO)"
+
+# Build docs + sync + commit + push (one-command publish)
+publish-site-commit: publish-site
+	cd "$(SITE_REPO)" && \
+	  git add -A && \
+	  (git commit -m "Publish site" || true) && \
+	  git push
+	@echo "Published (GitHub Pages will update automatically)."
