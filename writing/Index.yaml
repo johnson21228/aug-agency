@@ -94,4 +94,18 @@ writings:
     notes: >
       Explores downstream implications once routine work is displaced and judgment becomes central.
 
+  - id: W-llm-limits-005
+    path: writing/essays/claude-chatgpt-limits-for-thinking.md
+    title: The Limits of “Thinking Support” Without Continuity
+    status: published
+    authoritative: true
+    created: 2026-01-06
+    tags: [llms, thinking, continuity, coherence]
+    depends_on: [W-agency-001, W-conditions-002]
+    relations: []
+    notes: >
+      Establishes why coherence-first LLM systems framed as “thinking support”
+      are structurally incapable of preserving long-horizon continuity, and
+      positions IAM as a complementary continuity-preserving substrate.
+
 drafts: []
