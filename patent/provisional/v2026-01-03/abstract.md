@@ -1,9 +1,9 @@
-# Abstract
+ABSTRACT
 
-Systems and methods are disclosed for supporting human agency in digital environments by preserving continuity of human-generated activity across time.
+A system and method are disclosed for maintaining longitudinal continuity across time without semantic persistence. The disclosed system comprises a numeric continuity substrate that stores and operates exclusively on numeric continuity data supplied by one or more external processes. The substrate is structurally incapable of storing, encoding, resolving, or deriving semantic meaning, identity, authorship, or interpretive content.
 
-The disclosed approach provides a non-semantic continuity substrate that captures explicit human language inputs as structured traces without inferring meaning, intent, or goals. These traces are organized to enable re-entry into prior activity without summarization or reconstruction, thereby preserving the conditions under which human thinking can persist longitudinally and providing structural assurance for trust.
+Continuity is represented as time-ordered numeric elements that preserve temporal relationships without retaining interpretable representations of prior interaction. Using only numeric and temporal relationships, the system supports continuity operations including persistence across sessions, detection of recurrence, measurement of drift, and re-entry into prior continuity regions without reconstructing semantic context or inferred intent.
 
-In contrast to agent-based systems that optimize execution or infer objectives, the disclosed system maintains privacy and agency by structurally avoiding semantic interpretation. Continuity is preserved independently of content understanding, enabling human imagination, attention, and meaning-making to unfold without interference.
+Semantic interpretation, if performed, occurs only in systems external to the numeric continuity substrate and does not persist within continuity state. Associations between continuity identifiers and semantic content may exist externally but are not accessible to, nor resolvable by, the substrate itself.
 
-The system may be implemented as a conversational interface that accepts explicit human language–user inputs and supports return through return points, regions, and temporal structures. In such embodiments, the continuity substrate underwrites trust but is not presented as the primary user-facing feature, while preventing agent overreach and protecting human autonomy.
+The disclosed system may be implemented in interactive or conversational environments that accept explicit human inputs and support re-entry through temporal structures, while maintaining the continuity substrate as a non-semantic, non-authoritative layer underlying user interaction.
