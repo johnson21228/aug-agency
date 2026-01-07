@@ -93,31 +93,21 @@ Any component requiring these properties is out of scope by definition.
 
 ## Embeddings Policy
 
-Embeddings may be used as non-authoritative coordinates to locate paths
-within space.
+Embeddings (and other latent-space vectors) may be attached to continuity IDs as **numeric, versioned overlays**.
 
-Embeddings:
-• provide location, not meaning
-• do not define importance
-• do not collapse temporal distinction
-• may not override continuity
+- Embeddings provide *coordinates*, not meaning.
+- They do not define importance or value.
+- They may not override continuity ordering, adjacency, or stitching.
+- Continuity correctness must not depend on their presence.
+
+### Authority and placement
+
+- The authoritative definition of any embedding space is externalized as metadata (e.g., `space_id`, model/version, dimension, normalization).
+- Multiple spaces may coexist simultaneously.
+- Substrate implementations may replicate vectors for performance/portability, but only as overlays that remain attributable to `space_id` and build/version.
 
 Continuity remains primary; embeddings are a chart, not the terrain.
 
----
-
-## Forces and Dynamics
-
-The manifold does not require explicit forces or dynamics.
-
-If inferred:
-• forces are secondary
-• forces are explanatory only
-• forces may not generate or alter paths
-
-The system persists curves, not causes.
-
----
 
 ## Human Authority
 

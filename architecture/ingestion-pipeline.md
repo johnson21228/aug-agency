@@ -1,94 +1,67 @@
 # Continuity Ingestion Pipeline
 
-This document describes how inputs enter the continuity architecture.
+## How can a system grow richer over time without corrupting itself?
 
-The Continuity Ingestion Pipeline is the workflow by which explicit human-generated language inputs (LUIs) and other events are transformed into a continuity-preserving structure suitable for longitudinal re-entry.
+This document describes the movement of data through time.
 
-This pipeline forms continuity.  
-It does not interpret meaning.
+The ingestion pipeline is framed not as a one-way funnel, but as a **closed, reflexive loop**. Inputs may originate externally (e.g., ChatGPT exports or other language sources), or internally, as reflective artifacts produced by humans during IAM use. Both are treated identically at ingress. There is no privileged path.
 
----
+The pipeline narrative emphasizes **contraction rather than enrichment**. Inputs are normalized into a uniform event record, stripped of origin-specific structure, and assigned stable identity grounded in capture provenance, not in semantic interpretation.
 
-## Input Sources
+The pipeline then explicitly bifurcates into two derived families:
 
-Inputs may originate from:
-- human language acts (LUIs)
-- tools
-- agents
-- sensors
-- systems
+- **Provenance stores**, which bind events back to language, spans, and semantic coordinate overlays.
+- **Substrate stores**, which construct semantic-free continuity geometry for navigation and re-entry.
 
-All inputs are treated as explicit events, not semantic content.
+The essay logic is that **meaning and continuity are deliberately separated**. Meaning is allowed to evolve, embeddings to be replaced, segmentation to change—because none of these define identity. Continuity survives because it is built atop stable capture and rebuilt as needed.
+
+By explicitly stating that artifacts generated during IAM use re-enter the pipeline as inputs, the architecture closes the reflexive loop while maintaining safety. Nothing ever flows “backward” to rewrite history.
 
 ---
 
 ## Ingestion Principles
 
-The pipeline operates under the following constraints:
-
-- no semantic interpretation at ingress
-- no goal inference
-- no optimization
-- no summarization
-
-Ingress converts inputs into non-semantic traces that preserve ordering and identity without extracting meaning.
+- All inputs are captured append-only.
+- No input is interpreted for meaning at ingress.
+- No derived structure is authoritative.
+- Identity is assigned only at the event level.
+- All downstream structures must be rebuildable from capture.
 
 ---
 
-## First Output: LUI Capture Layer (Source-of-Record)
+## Reflexive Ingress (Artifacts as Inputs)
 
-The first invariant output of ingestion is the **LUI Capture Layer**: a persistent, addressable record of explicit events suitable for longitudinal reference.
+The ingestion pipeline is reflexive: artifacts generated through IAM use are re-captured as explicit events and re-enter the pipeline through the same capture interface as external inputs.
 
-These records populate the **Continuity Atlas**, which stores continuity structures such as ordering, regions, return points, adjacency, and stitching.
-
-CAP (Continuity Access Protocol) defines the interface and protocol by which these Atlas structures are accessed and navigated.
-
-See: `architecture/lui-capture-layer.md`.
+These artifacts are treated strictly as data. They may influence future retrieval, navigation, or continuity construction only through derived overlays. They must never modify prior capture, rewrite history, or alter operational rules.
 
 ---
 
 ## Pipeline Stages
 
-1. **Capture** — explicit event recorded
-2. **Time-indexing** — temporal ordering preserved
-3. **Structural anchoring** — trace placed into the Atlas
-4. **Optional interface exposure** — via IAM using CAP
+1. **Capture** — Inputs are recorded as explicit language-use events with full provenance retained.
+2. **Normalize + stable event ID assignment** — Inputs are contracted into a uniform event record suitable for longitudinal reference.
+3. **Provenance projection** — Events are associated with language spans and optional semantic coordinate overlays.
+4. **Substrate construction** — Semantic-free continuity geometry is built for navigation and re-entry.
+5. **IAM orchestration** — Provenance and substrate views are coordinated to support human judgment and continuity of thought.
 
-Meaning is not processed at any stage.  
-Meaning re-emerges only through human re-entry.
-
----
-
-## Architectural Boundary
-
-Ingestion is a one-way boundary:
-
-- semantics do not pass downward
-- continuity does not infer upward
-
-This boundary is enforced structurally, not by policy.
+Meaning is not processed at any stage. Meaning re-emerges only through human re-entry.
 
 ---
 
-## Relationship to IAM
+## Slices and Multiple Substrates
 
-The Continuity Ingestion Pipeline is not IAM.
+The architecture supports:
 
-- IAM is the conversational interface and thinking support tool.
-- The ingestion pipeline operates beneath IAM to provide structural assurance for trust.
+- **Multiple substrates** (e.g., event-level vs continuon-level) over the same stable event ID set.
+- **Slices**: derived selections or projections of IDs (and optional cached text spans) optimized for a specific task, while preserving stable references back to authoritative provenance and continuity anchors.
 
-IAM relies on continuity preserved in the Atlas and accessed via CAP, but does not expose the substrate or protocol as user-facing features.
-
----
-
-## Optional Overlays
-
-Chunking, summaries, and semantic assistance may be computed as overlays, but they are not required for continuity correctness and must remain separable from the LUI Capture Layer and Atlas.
+All substrates and slices remain addressable via the same event identities and can be composed at the IAM layer.
 
 ---
 
 ## Atlas Stitching (Internal Name)
 
-Internally, this process may be referred to as **Atlas Stitching**, reflecting the assembly of local continuity records into a coherent Atlas without collapsing meaning.
+Internally, this coordination process may be referred to as **Atlas Stitching**: the assembly of multiple derived continuity records into a coherent Atlas without collapsing meaning.
 
-This name is conceptual and does not imply semantic interpretation.
+This name is conceptual only and does not imply semantic interpretation.
