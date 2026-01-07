@@ -9,7 +9,8 @@ Includes:
 - All untracked files that are NOT ignored
 
 Then filters to:
-- Only *.md files
+- Only *.md and *.py files
+ 
 
 Excludes:
 - Anything ignored by .gitignore
@@ -27,7 +28,7 @@ from datetime import datetime
 
 
 EXCLUDED_TOP_LEVEL_DIRS = {"data"}
-ALLOWED_EXTS = {".md"}
+ALLOWED_EXTS =  {".md", ".py"}
 
 
 def git(cmd):
@@ -50,7 +51,7 @@ def main():
     repo_root = git(["git", "rev-parse", "--show-toplevel"])
 
     timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    out_name = f"augmented-agency-ingest-md-{timestamp}.zip"
+    out_name = f"augmented-agency-ingest-md-py-{timestamp}.zip"
     out_path = os.path.join(repo_root, out_name)
 
     raw = subprocess.check_output([

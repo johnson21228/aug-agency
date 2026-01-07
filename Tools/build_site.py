@@ -216,8 +216,13 @@ def build_site(repo_root: Path, out_dir: Path, site_title: str) -> None:
 		all_entries.append((entry, html_name, True))
 
 	# Build landing page lists
-	# "Start here" = first 3 authoritative writings, in the order listed
-	start_here = [x for x in all_entries if x[2] is False][:3]
+
+	# "Start here" = explicitly curated entries (Index.yaml: start_here: true)
+	start_here = [x for x in all_entries if (x[2] is False and x[0].get("start_here") is True)]
+	if not start_here:
+		# Fallback for older indexes: first 3 authoritative writings, in the order listed
+		start_here = [x for x in all_entries if x[2] is False][:3]
+
 
 	def li_link(entry: dict, html_name: str, note: str | None = None) -> str:
 		title = html.escape(entry["title"])

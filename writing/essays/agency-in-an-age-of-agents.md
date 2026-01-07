@@ -1,5 +1,5 @@
 
-# Agency in an Age of Agents
+# Agency in an Age of Agents 
 
 ## Continuity, Privacy, and the Conditions of Human Thought
 

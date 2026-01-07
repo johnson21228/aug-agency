@@ -55,6 +55,7 @@ writings:
     tags: [agency, agents, asymmetry]
     depends_on: [W-intro-000]
     relations: []
+    start_here: true
     notes: >
       Core orientation essay framing the stakes around agency and asymmetry.
 
@@ -67,6 +68,7 @@ writings:
     tags: [continuity, privacy, cognition]
     depends_on: [W-agency-001]
     relations: []
+    start_here: true
     notes: >
       Establishes privacy and continuity as enabling conditions for sustained thought.
 

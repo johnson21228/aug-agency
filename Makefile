@@ -78,9 +78,9 @@ clean-data:
 	rm -rf data/inbox data/staging data/artifacts
 	@echo "Local data artifacts removed."
 
-.PHONY: pack-md
+.PHONY: pack-md-py
 
-pack-md:
+pack-md-py:
 	$(PYTHON) Tools/pack_md_repo.py
 
 
