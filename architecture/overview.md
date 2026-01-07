@@ -6,9 +6,9 @@ This document establishes the identity of the system before any implementation d
 
 IAM is presented not as a tool for producing answers, nor as an agent that acts autonomously, but as a system designed to preserve and extend human continuity of thought over time. Its core claim is that human judgment, reflection, and meaning do not arise from isolated inference, but from sustained engagement with one’s own prior reasoning.
 
-IAM is explicitly reflexive: outputs created through use of the system—annotations, links, decisions, moments of recognition—are allowed to re-enter the system as inputs. However, this reflexivity is tightly constrained. The system does not learn, adapt, or modify its operational rules as a result of those inputs. Reflexivity is permitted only at the level of memory and structure, never at the level of control logic.
+IAM is explicitly reflexive: outputs created through use of the system—annotations, links, decisions, moments of recognition—are allowed to re-enter the system as inputs. This reflexivity is structural rather than behavioral. Artifacts re-enter the system as captured history, not as changes to how the system operates.
 
-This distinction matters. It positions IAM clearly away from agentic or self-modifying AI systems. IAM does not attempt to replace human judgment; it preserves it by making reflective acts durable without turning them into rules. Rebuildability is treated as a feature, not a limitation: derived structures may change, but captured history does not. That principle underwrites the entire architecture.
+This distinction matters. It positions IAM away from systems that act, decide, or optimize on behalf of the user. IAM does not attempt to replace human judgment; it preserves it by making reflective acts durable without turning them into rules. Rebuildability is treated as a feature, not a limitation: derived structures may change, but captured history does not. That principle underwrites the entire architecture.
 
 The IAM architecture exists to operationalize the claims made in the writings.
 It is not an independent source of truth.
@@ -27,18 +27,29 @@ Optimization, compression, and summarization may appear in derived layers, but t
 
 ⸻
 
-What IAM is not
+Being-in-Time (Digital)
 
-IAM is not an agent, a retrieval system, or a memory plugin layered onto a language model. It does not act autonomously, pursue goals, optimize rewards, or modify its own behavior over time. Unlike RAG systems, IAM does not treat memory as a searchable corpus to be flattened into embeddings for answer production, nor does it treat retrieval as a substitute for continuity. Unlike note-taking or memory tools, IAM does not externalize thought as static artifacts detached from temporal context. IAM preserves continuity by capturing language use and reflective acts as they occur, allowing meaning to re-emerge through re-entry rather than being inferred, summarized, or optimized in advance.
+IAM is designed to preserve language use as it unfolds in time, rather than as a set of detached representations. Captured language-use events are not treated as timeless facts, but as expressions situated within a lived temporal sequence.
+
+By preserving ordering, revisitation, and re-entry, IAM enables digital language use to retain a temporal character analogous to being-in-time: meaning emerges through return, context, and continuation, not through isolated interpretation.
+
+IAM does not model or infer being; it preserves the conditions under which meaning remains intelligible over time.
 
 ⸻
 
-Reflexive but Non-Self-Modifying System
+What IAM is not
+
+IAM is not an agent, a retrieval system, or a memory plugin layered onto a language model. It does not act autonomously or pursue outcomes on behalf of the user. Unlike retrieval-based systems, IAM does not treat memory as a corpus to be flattened into embeddings for answer production, nor does it treat retrieval as a substitute for continuity. Unlike note-taking or archival tools, IAM does not externalize thought as static artifacts detached from temporal context.
+
+IAM preserves continuity by capturing language use and reflective acts as they occur, allowing meaning to re-emerge through re-entry rather than being inferred, summarized, or optimized in advance.
+
+⸻
+
+Reflexive system with invariant structure
 
 IAM permits artifacts produced through human interaction within the system—annotations, return points, links, decisions (“gold”)—to re-enter the system as first-class inputs.
 
-These artifacts are captured append-only as data and never as operational rules.
-The system does not learn, retrain, or modify its governing logic as a result of such inputs.
+These artifacts are captured append-only as data and incorporated into the system’s history. The system’s governing structure remains invariant; growth occurs exclusively through accumulated capture and rebuildable derived views.
 
 All derived structures may be rebuilt or replaced without invalidating captured history.
 
