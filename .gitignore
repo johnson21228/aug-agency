@@ -14,87 +14,45 @@
 *.swp
 *.swo
 *.bak
-*.orig
 
 ############################
-# Python
-############################
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.mypy_cache/
-.ruff_cache/
-
-############################
-# SQLite / local data artifacts
-############################
-*.db
-*.db-wal
-*.db-shm
-*.sqlite
-*.sqlite3
-*.sqlite-wal
-*.sqlite-shm
-
-############################
-# Repo-specific data (local only)
-############################
-data/inbox/
-data/inbox/**
-
-data/artifacts/
-data/artifacts/**
-
-############################
-# ChatGPT / LLM exports (raw)
-############################
-**/chatgpt_export/
-**/chatgpt-export-*/
-**/conversations.json
-**/chat.html
-**/group_chats.json
-**/shared_conversations.json
-**/message_feedback.json
-**/shopping.json
-**/sora.json
-**/user-*/
-
-############################
-# Images from exports (usually huge)
-############################
-**/chatgpt-export-*/*.png
-**/chatgpt-export-*/*.jpg
-**/chatgpt-export-*/*.jpeg
-**/chatgpt-export-*/*.webp
-
-############################
-# Xcode / Swift / Apple dev
-############################
-DerivedData/
-.build/
-.build-*/
-.swiftpm/
-
-**/*.xcuserdatad/
-**/*.xcuserdata/
-**/*.xcuserstate
-**/*.xcbkptlist
-
-*.xcarchive
-*.ipa
-*.dSYM
-*.dSYM.zip
-
-############################
-# Workspace noise
+# Workspace / IDE noise
 ############################
 .vscode/
 .idea/
 
 ############################
+# Python / build artifacts
+############################
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.venv/
+.env/
+
+############################
+# IAM raw ingestion inputs
+# (never commit source materials)
+############################
+*chatgpt-export*.zip
+conversations.json
+*/chatgpt-export-*.zip
+
+############################
+# IAM databases (derived artifacts)
+############################
+iam.db
+provdb*.db
+subdb*.db
+
+############################
+# Local data directory
+# (inputs, inboxes, scratch)
+############################
+data/
+
+############################
 # Allow placeholders
 ############################
 !.keep
-
-# Local data (exports, dbs, inbox)
-data/

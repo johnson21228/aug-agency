@@ -1,135 +1,66 @@
-# Architecture Invariants
+# IAM Invariants
 
-This document enumerates the non-negotiable invariants of the IAM architecture.
-These invariants define what must remain true across all implementations, migrations,
-optimizations, and future evolutions of the system.
+These invariants are non-negotiable.
+If code or prompts conflict with these invariants, the invariants override.
 
-They exist to ensure continuity of thought, durability of human judgment,
-and long-horizon rebuildability in the presence of changing models, tools, and techniques.
+## 1) Language is infrastructure
+Language in this repo is not documentation. It is executable constraint.
 
----
+- Invariants declared in the repo override inferred intent.
+- Prompts are interpreters over the corpus, not authors of new authority.
+- Architecture text constrains code; code does not redefine architecture.
 
-## 1. Preserve Originals
+## 2) Append-only capture
+Capture is mandatory and append-only.
 
-All captured language-use events (LUIs) are preserved append-only.
+- Ingestion writes only append-only facts.
+- No updates or deletes of captured facts.
+- Idempotence is required for repeated ingestion.
 
-Once recorded in the Capture Store (`iam.db`), no event may be deleted, rewritten,
-or semantically reinterpreted in place. Corrections, annotations, or reinterpretations
-must be captured as new events.
+## 3) Stable identity is event-level
+Stable identity is assigned at the event level.
 
-Originals are the sole irreducible ground truth of the system.
+- Durable referents for continuity, annotation, and long-horizon linkage must be event identities.
+- Derived identifiers must be traceable to capture provenance.
 
----
-
-## 2. Reflexive Capture (Artifacts Become Inputs)
-
-Artifacts produced during IAM use—annotations, return points, links, decisions,
-and other reflective acts (“gold”)—are treated as first-class inputs.
-
-These artifacts are captured append-only as data, using the same capture interface
-as external inputs. They must never modify prior capture, overwrite history,
-or alter operational rules.
-
-IAM is reflexive but not self-modifying.
-
----
-
-## 3. Stable Identity Is Derived Solely from Capture
-
-Durable identity is assigned only at the event level and is derived solely
-from capture provenance.
-
-No identifier whose stability depends on semantic interpretation,
-model behavior, embeddings, or segmentation may be treated as durable.
-
-Continuon identifiers, chunk identifiers, and run-local indices are projections,
-not identities.
-
+### Clarification: Node projections are permitted
 Event identity is the only durable identity. However, the system may build
-policy-versioned, rebuildable *node projections* (e.g. PRPs, chunkings) as
-non-authoritative layers over events.
+policy-versioned, rebuildable node projections (e.g., PRPs, chunkings, sessions)
+as non-authoritative layers over events.
 
 Such projections must:
-- be explicitly named/versioned (layer_key)
+- be explicitly named/versioned (`layer_key`)
+- be deterministic and rebuildable from events
 - be lossless via ordered membership pointers to event identities
-- never be used as durable referents for annotations or long-horizon identity
+- never be used as durable referents for annotation or long-horizon identity
 
----
+## 4) Derived structures are rebuildable and non-authoritative
+Derived structures (ProvDB, SubDB, overlays) must be rebuildable and replaceable.
 
-## 4. No Durable Feature May Depend on Ephemeral IDs
+- Derived tables are not authoritative; they can be deleted and rebuilt.
+- Version overlays explicitly; never overwrite capture.
 
-No durable reference, annotation, or structural feature may depend on
-build-scoped or run-scoped identifiers.
+## 5) Semantic interpretation must never be required for correctness
+Continuity correctness must not require semantic interpretation.
 
-All durable references must anchor to capture-stable addresses
-(e.g., event identity and optional spans within captured language).
+- Embeddings, similarity, summaries, and meaning-coordinates are overlays.
+- If semantic overlays are removed, continuity geometry must still be valid.
 
-This ensures that all derived structures may be deleted and rebuilt safely.
+## 6) CAP never performs semantic joins inside the substrate
+CAP is read-only orchestration over derived stores.
 
----
+- Join only by stable IDs.
+- Composition is ephemeral and must not be persisted.
+- CAP must not depend on semantic joins for correctness.
 
-## 5. Meaning and Continuity Are Deliberately Separated
+## 7) Provenance is always preserved
+Every derived item must be traceable back to capture.
 
-Semantic interpretation and continuity structure are intentionally decoupled.
+- Preserve provenance pointers and stable identifiers.
+- Preserve raw payloads as opaque ground truth.
 
-- Meaning may evolve.
-- Embeddings may be replaced.
-- Segmentation may change.
-- Models may be upgraded or removed.
+## 8) Determinism over cleverness
+Builders must be deterministic and traceable.
 
-Continuity survives because it is grounded in capture, not semantics.
-
----
-
-## 6. Derived Structures Are Non-Authoritative
-
-All structures beyond the Capture Store—including provenance projections,
-semantic overlays, substrates, slices, and indices—are derived and non-authoritative.
-
-They exist to support navigation, retrieval, and re-entry, but they do not
-define truth or identity.
-
-Any derived structure may be discarded and rebuilt from capture at any time.
-
----
-
-## 7. Correctness Must Not Depend on Semantics
-
-System correctness—ordering, navigability, re-entry, and referential integrity—
-must not depend on embeddings, clustering, topic models, or other semantic techniques.
-
-Semantic overlays may enhance utility, but their absence must not break the system.
-
----
-
-## 8. Rebuildability Is a First-Class Guarantee
-
-It must always be possible to:
-
-- delete all derived databases,
-- change segmentation or models,
-- upgrade software or schemas,
-
-and fully reconstruct all non-authoritative structures from the Capture Store.
-
-Rebuildability is not an operational convenience; it is a core architectural guarantee.
-
----
-
-## 9. Human Judgment Is the Source of Curvature
-
-IAM does not learn, optimize, or adapt its governing logic autonomously.
-
-Continuity gains meaning through human judgment expressed over time,
-captured as language-use events.
-
-The system preserves and re-presents judgment; it does not replace it.
-
----
-
-## Status
-
-These invariants constrain all future work.
-Any proposed change that violates an invariant must be rejected or redesigned.
-
-They are enforced not by convention, but by architecture.
+- Prefer clarity and rebuildability.
+- Prefer explicit policies over implicit heuristics.

@@ -24,7 +24,7 @@ Events are the only durable referents for annotations, links, and long-horizon c
 A node is a derived grouping of one or more events intended for navigation, re-entry,
 and continuity geometry.
 
-Nodes are *projections*, not identities.
+Nodes are projections, not identities.
 
 Nodes must be:
 - deterministic from events
@@ -44,8 +44,12 @@ A single `iam.db` capture can produce many node layers in parallel.
 ### Layer identity
 Each layer MUST be explicitly named and versioned:
 - `layer_key` (string, stable)
-- `layer_policy_json` (explicit policy contract; may change only by creating a new layer_key)
+- `policy_json` (explicit policy contract; changes require a new layer_key)
 - optional `layer_hash` (hash of canonical policy json)
+
+## Canonical Layer
+IAM selects one node layer as canonical for default SubDB geometry and CAP re-entry.
+The canonical layer is governed by `architecture/decisions/node-layer-canonical.md`.
 
 ## Node Interface (SQL Contract)
 
@@ -77,7 +81,7 @@ This is the continuity correctness guarantee.
 
 SubDB is semantic-free continuity geometry over `node_id`.
 
-There is only one SubDB "node" concept: `node_id` with coordinates in a stream.
+There is only one SubDB node concept: `node_id` with coordinates in a stream.
 
 For each layer, SubDB may be materialized as:
 - a separate `subdb/<layer_key>.db`, or
@@ -103,5 +107,4 @@ CAP may present:
 No layer composition is persisted into substrate stores.
 
 ## Status
-
 This document is governing architecture: code must conform.
