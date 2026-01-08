@@ -25,6 +25,7 @@ If contradictions exist, higher authority wins.
 - `Migrations/*.sql` — executable schema law (capture contract)
 - `architecture/node-projections.md` — node layers, parallel pairings, SubDB node contract
 - `architecture/decisions/node-layer-canonical.md` — canonical layer selection for IAM re-entry
+- `architecture/continuity-manifold-model.md` — continuity manifold storage, paths, and semantic interpretation
 
 ## Evolution rule
 

@@ -89,3 +89,18 @@ Semantic DB answers:
 ## 4. Mapping Contract
 
 The mapping between layers is explicit and identity-based.
+
+The manifold exists only in SubDB.
+
+---
+
+## 5. IAM Orchestration
+
+IAM, via CAP:
+
+- queries SubDB for paths and regions
+- consults ProvDB for coordinate and metric definitions
+- optionally consults Semantic DB for interpretation
+- composes results ephemerally
+
+This separation is architecture law.

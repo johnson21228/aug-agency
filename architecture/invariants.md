@@ -64,3 +64,15 @@ Builders must be deterministic and traceable.
 
 - Prefer clarity and rebuildability.
 - Prefer explicit policies over implicit heuristics.
+
+## 9) Continuity manifold and paths
+
+The continuity manifold is stored in SubDB.
+
+- ProvDB defines coordinate schemas and metric definitions.
+- SubDB materializes those coordinates into a manifold.
+- Paths exist as curves or sequences within SubDB.
+- Semantic meaning interprets nodes and paths but does not define them.
+
+Continuity correctness depends only on SubDB geometry
+and ProvDB definitions, not on semantic interpretation.
