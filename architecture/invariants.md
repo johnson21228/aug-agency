@@ -45,6 +45,15 @@ model behavior, embeddings, or segmentation may be treated as durable.
 Continuon identifiers, chunk identifiers, and run-local indices are projections,
 not identities.
 
+Event identity is the only durable identity. However, the system may build
+policy-versioned, rebuildable *node projections* (e.g. PRPs, chunkings) as
+non-authoritative layers over events.
+
+Such projections must:
+- be explicitly named/versioned (layer_key)
+- be lossless via ordered membership pointers to event identities
+- never be used as durable referents for annotations or long-horizon identity
+
 ---
 
 ## 4. No Durable Feature May Depend on Ephemeral IDs

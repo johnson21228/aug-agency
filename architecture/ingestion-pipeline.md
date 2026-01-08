@@ -46,7 +46,10 @@ Ingestion is realized as a three-store architecture with strict ownership bounda
 - May replicate numeric semantic coordinates only as versioned overlays.  
 - Substrate correctness must not depend on semantic overlays.
 
-Join key: composition happens by stable IDs (event_id, and any build-scoped projection IDs when explicitly used).
+Join key: composition happens by stable event IDs. Derived node projections
+(PRPs, chunkings, sessions) may also be used as build-scoped node IDs when
+explicitly named and versioned as layers. These projections must remain
+rebuildable, non-authoritative, and lossless via membership back to event IDs.
 
 ## Append-Only and Concurrency Contract
 
@@ -63,6 +66,13 @@ Join key: composition happens by stable IDs (event_id, and any build-scoped proj
 5. IAM orchestration — ProvDB and SubDB are jointly consulted ephemerally for re-entry.
 
 Meaning is not processed at any stage. Meaning re-emerges only through human re-entry.
+
+## Parallel Node Layers (Pairings)
+
+From the same `iam.db` capture and the same `provdb/core` event identities,
+multiple node layers may be derived in parallel (e.g. PRP pairing, alternative
+chunking). Each layer is policy-versioned and maps to semantic-free SubDB
+geometry over layer-scoped `node_id`s.
 
 ## Reflexive Ingress
 

@@ -27,6 +27,7 @@ If contradictions exist, resolve upward. Lower layers adapt to higher layers.
 - `architecture/ingestion-pipeline.md` — adapter → iam.db → provdb → subdb narrative
 - `architecture/migrations.md` — evolution policy
 - `migrations/*.sql` — executable schema law (capture contract)
+- `architecture/node-projections.md — node layers, parallel pairings, SubDB node contract
 
 ## Evolution rule
 
