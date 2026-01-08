@@ -76,3 +76,17 @@ The continuity manifold is stored in SubDB.
 
 Continuity correctness depends only on SubDB geometry
 and ProvDB definitions, not on semantic interpretation.
+
+## 10) Adapters must not require user sequencing
+
+Adapters capture facts and must not require the user to pre-sequence LUIs.
+
+- Adapters must accept LUIs in any arrival order.
+- Adapters must not invent semantic sequencing fields or require user-supplied ordering.
+- If the source provides an observed time, record it as `observed_ts`.
+- If observed time is missing, leave `observed_ts` NULL.
+
+Deterministic ordering is derived downstream using capture facts:
+- per stream: `ORDER BY observed_ts NULLS LAST, observed_ts ASC, capture_id ASC`
+
+This ensures continuity can be built without forcing the human to curate sequence.

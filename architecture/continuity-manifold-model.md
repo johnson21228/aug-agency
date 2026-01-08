@@ -65,6 +65,10 @@ SubDB answers:
 
 ---
 
+### Note on ordering and paths
+
+Paths in the continuity manifold are defined over a **derived, deterministic order**, not a human-curated sequence. Adapters do not require users to pre-sequence LUIs. Ordering is computed downstream from capture facts: source-provided timestamps when available, and append-only capture order otherwise. This ensures that continuity paths can be constructed without imposing curation burden on the user, while remaining stable, reproducible, and independent of semantic interpretation.
+
 ## 3. Semantic DB — Interpretation Layer
 
 The Semantic DB interprets the continuity manifold.

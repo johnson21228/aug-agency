@@ -173,3 +173,65 @@ publish: push-site
 # Backwards-compatible target names
 publish-site: sync-site
 publish-site-commit: publish
+
+
+# -------- Paths --------
+IAM_DB := iam.db
+PROVDB := provdb_core.db
+SUBDB := subdb_nodes.db
+
+CAPTURE_SCHEMA := Migrations/0001_capture_contract.sql
+
+# -------- Init targets --------
+
+.PHONY: init-iam-db
+init-iam-db:
+	@if [ -f $(IAM_DB) ]; then \
+		echo "$(IAM_DB) already exists"; \
+	else \
+		echo "Creating $(IAM_DB)"; \
+		sqlite3 $(IAM_DB) < $(CAPTURE_SCHEMA); \
+	fi
+
+.PHONY: init-provdb
+init-provdb: init-iam-db
+	@if [ -f $(PROVDB) ]; then \
+		echo "$(PROVDB) already exists"; \
+	else \
+		echo "Creating empty $(PROVDB)"; \
+		python3 code/provDB/build_provdb_core.py --iam-db $(IAM_DB) --out $(PROVDB); \
+	fi
+
+# -------- Build targets --------
+
+.PHONY: build-provdb
+build-provdb:
+	@if [ ! -f $(IAM_DB) ]; then \
+		echo "ERROR: $(IAM_DB) missing. Run 'make init-iam-db' first."; \
+		exit 1; \
+	fi
+	python3 code/provDB/build_provdb_core.py --iam-db $(IAM_DB) --out $(PROVDB)
+
+.PHONY: build-prp-nodes
+build-prp-nodes:
+	@if [ ! -f $(PROVDB) ]; then \
+		echo "ERROR: $(PROVDB) missing. Run 'make build-provdb' first."; \
+		exit 1; \
+	fi
+	python3 code/provDB/build_provdb_nodes_prp_v1.py --provdb $(PROVDB)
+
+.PHONY: build-subdb
+build-subdb:
+	@if [ ! -f $(PROVDB) ]; then \
+		echo "ERROR: $(PROVDB) missing. Run 'make build-provdb' first."; \
+		exit 1; \
+	fi
+	python3 code/subDB/build_subdb_nodes.py \
+		--provdb $(PROVDB) \
+		--layer prp_v1_turn_pairing \
+		--out $(SUBDB)
+
+# -------- One-shot --------
+
+.PHONY: init-all
+init-all: init-iam-db build-provdb build-prp-nodes build-subdb

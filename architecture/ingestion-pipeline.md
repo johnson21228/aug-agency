@@ -77,3 +77,17 @@ geometry over layer-scoped `node_id`s.
 ## Reflexive Ingress
 
 Artifacts generated during IAM use re-enter the pipeline as explicit capture events through the same capture interface as external inputs. They are treated strictly as data and must never rewrite prior capture.
+
+
+## Sequencing policy
+
+Adapters do not impose or require human sequencing.
+
+Capture records:
+- `observed_ts` when available (source-provided)
+- `capture_id` as append-only insertion order
+
+Builders derive deterministic stream order from capture:
+- `observed_ts NULLS LAST, observed_ts ASC, capture_id ASC`
+
+No semantic sequencing is performed at capture.
