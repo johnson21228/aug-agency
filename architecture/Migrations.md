@@ -6,6 +6,7 @@ The guiding model is “Photos”: originals are preserved; derived structures c
 
 ---
 
+
 ## Scope
 
 Applies to all on-device data stores:
