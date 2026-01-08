@@ -2,20 +2,16 @@
 """
 make_ingest_zip.py
 
-Create a ZIP archive of the repository suitable for one-shot ingestion.
-
-Includes:
-- All tracked files
+Create a ZIP from:
+- All tracked files in the repo (git ls-files)
 - All untracked files that are NOT ignored
 
 Then filters to:
 - Only *.md and *.py files
- 
 
 Excludes:
 - Anything ignored by .gitignore
-- The entire `data/` directory (hard exclusion)
-- .git metadata
+- Anything under excluded top-level dirs (see EXCLUDED_TOP_LEVEL_DIRS)
 
 Usage:
     make ingest-zip
@@ -26,25 +22,12 @@ import os
 import zipfile
 from datetime import datetime
 
-
 EXCLUDED_TOP_LEVEL_DIRS = {"data"}
 ALLOWED_EXTS =  {".md", ".py"}
 
 
 def git(cmd):
     return subprocess.check_output(cmd, text=True).strip()
-
-
-def is_excluded(rel_path: str) -> bool:
-    """Hard exclusions beyond gitignore."""
-    parts = rel_path.split(os.sep)
-    return parts[0] in EXCLUDED_TOP_LEVEL_DIRS
-
-
-def is_allowed(rel_path: str) -> bool:
-    """Content-type filter for ingestion."""
-    _, ext = os.path.splitext(rel_path)
-    return ext.lower() in ALLOWED_EXTS
 
 
 def main():
@@ -54,42 +37,43 @@ def main():
     out_name = f"augmented-agency-ingest-md-py-{timestamp}.zip"
     out_path = os.path.join(repo_root, out_name)
 
-    raw = subprocess.check_output([
-        "git", "ls-files",
-        "-z",
-        "--cached",
-        "--others",
-        "--exclude-standard"
-    ])
+    # tracked files
+    tracked = git(["git", "ls-files"]).splitlines()
 
-    paths = [p.decode("utf-8") for p in raw.split(b"\0") if p]
+    # untracked, not ignored
+    untracked = git(["git", "ls-files", "--others", "--exclude-standard"]).splitlines()
 
-    included = []
+    all_files = tracked + untracked
+    selected = []
     skipped = []
 
-    with zipfile.ZipFile(out_path, "w", zipfile.ZIP_DEFLATED) as z:
-        for rel in paths:
-            if is_excluded(rel):
-                skipped.append(rel)
-                continue
+    for rel in all_files:
+        if not rel:
+            continue
 
-            if not is_allowed(rel):
-                skipped.append(rel)
-                continue
+        top = rel.split("/", 1)[0]
+        if top in EXCLUDED_TOP_LEVEL_DIRS:
+            skipped.append(rel)
+            continue
 
+        ext = os.path.splitext(rel)[1].lower()
+        if ext not in ALLOWED_EXTS:
+            skipped.append(rel)
+            continue
+
+        selected.append(rel)
+
+    with zipfile.ZipFile(out_path, "w", compression=zipfile.ZIP_DEFLATED) as z:
+        for rel in selected:
             abs_path = os.path.join(repo_root, rel)
-            if not os.path.isfile(abs_path):
-                continue
+            if os.path.isfile(abs_path):
+                z.write(abs_path, arcname=rel)
 
-            z.write(abs_path, arcname=rel)
-            included.append(rel)
-
-    print("Created ingest archive:")
-    print(f"  {out_path}")
-    print(f"Files included: {len(included)}")
-    print(f"Files skipped: {len(skipped)}")
+    print(f"Wrote: {out_path}")
+    print(f"Included: {len(selected)} files")
     if skipped:
-        print("  (e.g.)", skipped[:10])
+        print(f"Skipped: {len(skipped)} files (showing first 10)")
+        print("  " + "\n  ".join(skipped[:10]))
 
 
 if __name__ == "__main__":

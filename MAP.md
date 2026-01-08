@@ -1,50 +1,35 @@
-# Repository Authority Map
+# MAP — Repository Authority and Alignment
 
-This document defines **authority boundaries** within the repository.
-No file or layer may contradict a layer above it.
+This document defines the structural map of the repository: how its components relate, where authority resides, and how contradictions are resolved.
 
-## Authority ordering (highest → lowest)
+## Unifying concern
 
-1. **Writings (`writing/`)**
-2. **Architecture (`architecture/`, `core-ontology/`)**
-3. **Patent materials (`patent/`)**
-4. **Embodiments (`embodiments/`)**
-5. **Code (`code/`)**
-6. **Data and artifacts (`data/`, local only)**
+The unifying concern is preservation of human continuity of thought over time (being-in-time as preserved temporal intelligibility), in environments increasingly mediated by automation.
 
-## Layer definitions
+## Authority order (highest → lowest)
 
-### 1. Writings (authoritative, upstream)
-The writings articulate the core problem, stakes, and normative claims of the project.
-They define what the system is *for* and what outcomes matter.
+1) `writing/` — normative and conceptual foundation  
+2) `architecture/` — structural invariants, boundaries, pipelines  
+3) `patent/` — legal formalization (claims/disclosure)  
+4) `embodiments/` — reductions to practice  
+5) `core-ontology/` — shared vocabulary  
+6) `residue/` — supporting artifacts  
+7) `code/` — non-authoritative prototypes
 
-All downstream layers must remain consistent with the claims made in the writings.
+If contradictions exist, resolve upward. Lower layers adapt to higher layers.
 
-### 2. Architecture and ontology (technical truth layer)
-Architecture translates the writings into system invariants, levels, and protocols.
-The core ontology defines primitives and constraints used throughout the system.
+## Key governing documents
 
-Architecture may operationalize the writings, but may not weaken or reinterpret them.
+- `language-as-infrastructure.md` — repo-level continuity discipline
+- `architecture/invariants.md` — non-negotiable invariants
+- `architecture/overview.md` — system identity
+- `architecture/continuity-strata.md` — dependency strata (replaces “levels as folder” ambiguity)
+- `architecture/ingestion-pipeline.md` — adapter → iam.db → provdb → subdb narrative
+- `architecture/migrations.md` — evolution policy
+- `migrations/*.sql` — executable schema law (capture contract)
 
-### 3. Patent materials (legal crystallization)
-Patent drafts express the same ideas in legal form.
-They must be traceable to both the writings and the architecture.
+## Evolution rule
 
-### 4. Embodiments (reduction to practice)
-Embodiments demonstrate how the architecture can be realized.
-They are illustrative, not exhaustive, and are not authoritative.
-
-### 5. Code (non-authoritative)
-Code exists only as a proof of feasibility or exploration.
-It may be incomplete, experimental, or intentionally constrained.
-
-If code contradicts architecture or writings, the code is wrong.
-
-### 6. Data and artifacts
-Data is local, sensitive, and never authoritative.
-No committed data should be treated as normative or stable.
-
-## Non-contradiction rule
-
-Any contradiction must be resolved **upward**.
-Lower layers must adapt to higher layers, never the reverse.
+- Capture/originals are append-only.
+- Derived artifacts are rebuildable and versioned.
+- Prompts are interpreters over the corpus, not authorities.

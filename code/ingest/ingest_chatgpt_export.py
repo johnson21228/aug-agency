@@ -1,768 +1,234 @@
 #!/usr/bin/env python3
 """
-ingest_chatgpt_export.py
+ingest_chatgpt_export.py (Capture Adapter)
 
-Purpose
--------
-Ingest a ChatGPT data export (zip OR unzipped folder) into a SQLite database.
+Ingest a ChatGPT export (zip or directory) into iam.db capture schema:
 
-Design
-------
-- Inbox can be messy (zip or folder). Script normalizes into a deterministic staging dir.
-- Ingestion always reads from staging.
-- Writes an export_manifest.json capturing provenance + schema signature.
-- Idempotent by default: messages are upserted using a stable uniqueness key.
+- capture_events
+- capture_payload_parts
 
-Default paths (repo-root relative)
----------------------------------
-INPUT : data/inbox/chatgpt_export/
-STAGE : data/staging/chatgpt_export_latest/
-OUTPUT: data/artifacts/iam.db
-
-Usage
------
-# simplest (assumes you're running from repo root)
-python code/ingest/ingest_chatgpt_export.py
-
-# explicit
-python code/ingest/ingest_chatgpt_export.py \
-  --inbox data/inbox/chatgpt_export \
-  --staging data/staging/chatgpt_export_latest \
-  --db data/artifacts/iam.db
-
-# specify a particular export file/folder (zip or dir)
-python code/ingest/ingest_chatgpt_export.py --source data/inbox/chatgpt_export/2026-01-03.zip
-
-Notes
------
-This targets the common ChatGPT export shape where conversations live in conversations.json,
-and each conversation has a "mapping" dict of nodes (message tree).
+Append-only + idempotent by (source_type, source_ref, source_event_key).
+No semantic processing.
+No derived tables.
 """
 
-from __future__ import annotations
-
 import argparse
-import hashlib
 import json
 import os
-import re
-import shutil
 import sqlite3
-import sys
+import tempfile
 import zipfile
-from dataclasses import dataclass
 from datetime import datetime, timezone
 from pathlib import Path
-from typing import Any, Dict, Iterable, List, Optional, Tuple, Union
-
-Json = Union[dict, list, str, int, float, bool, None]
+from typing import Any, Dict, Iterable, List, Optional, Tuple
 
 
-# ----------------------------
-# Helpers: time, hashing, IO
-# ----------------------------
-
-def now_utc_iso() -> str:
-    return datetime.now(timezone.utc).isoformat()
-
-def utc_iso_from_export_ts(ts: Any) -> Optional[str]:
-    """Convert export timestamps (often seconds since epoch) into ISO8601."""
-    if ts is None:
-        return None
-    try:
-        # most common: float seconds
-        t = float(ts)
-        return datetime.fromtimestamp(t, tz=timezone.utc).isoformat()
-    except Exception:
-        pass
-    if isinstance(ts, str):
-        return ts
-    return None
-
-def sha256_bytes(b: bytes) -> str:
-    h = hashlib.sha256()
-    h.update(b)
-    return h.hexdigest()
-
-def sha256_file(p: Path, chunk_size: int = 1024 * 1024) -> str:
-    h = hashlib.sha256()
-    with p.open("rb") as f:
-        while True:
-            chunk = f.read(chunk_size)
-            if not chunk:
-                break
-            h.update(chunk)
-    return h.hexdigest()
-
-def read_json(path: Path) -> Json:
-    with path.open("r", encoding="utf-8") as f:
-        return json.load(f)
-
-def write_json(path: Path, obj: Any) -> None:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    with path.open("w", encoding="utf-8") as f:
-        json.dump(obj, f, ensure_ascii=False, indent=2)
-
-def ensure_clean_dir(dirpath: Path) -> None:
-    """Remove & recreate dir to guarantee deterministic staging."""
-    if dirpath.exists():
-        shutil.rmtree(dirpath)
-    dirpath.mkdir(parents=True, exist_ok=True)
-
-def iter_files_recursive(root: Path) -> Iterable[Path]:
-    for p in root.rglob("*"):
-        if p.is_file():
-            yield p
+SOURCE_TYPE = "chatgpt_export"
 
 
-# ----------------------------
-# Export discovery
-# ----------------------------
+def utc_now_iso() -> str:
+    return datetime.now(timezone.utc).isoformat(timespec="seconds")
 
-_DATE_RE = re.compile(r"(20\d{2})[-_]?([01]\d)[-_]?([0-3]\d)")
 
-@dataclass(frozen=True)
-class ExportCandidate:
-    path: Path
-    kind: str  # "zip" or "dir"
-    date_hint: Optional[str]  # YYYY-MM-DD if parsed
-    mtime: float
-
-def parse_date_hint_from_name(name: str) -> Optional[str]:
-    m = _DATE_RE.search(name)
-    if not m:
-        return None
-    y, mo, d = m.group(1), m.group(2), m.group(3)
-    return f"{y}-{mo}-{d}"
-
-def is_chatgpt_export_dir(p: Path) -> bool:
-    """A candidate directory if it contains conversations.json somewhere within."""
-    if not p.is_dir():
-        return False
-    # typically conversations.json is at root of export folder, but allow nested.
-    return any(fp.name == "conversations.json" for fp in p.rglob("conversations.json"))
-
-def find_conversations_json_in_dir(p: Path) -> Optional[Path]:
-    # prefer top-level
-    top = p / "conversations.json"
-    if top.exists():
-        return top
-    for fp in p.rglob("conversations.json"):
-        return fp
-    return None
-
-def discover_candidates(inbox_dir: Path) -> List[ExportCandidate]:
-    if not inbox_dir.exists():
-        return []
-
-    candidates: List[ExportCandidate] = []
-    for child in inbox_dir.iterdir():
-        try:
-            st = child.stat()
-        except FileNotFoundError:
-            continue
-
-        if child.is_file() and child.suffix.lower() == ".zip":
-            date_hint = parse_date_hint_from_name(child.name)
-            candidates.append(ExportCandidate(child, "zip", date_hint, st.st_mtime))
-        elif child.is_dir() and is_chatgpt_export_dir(child):
-            date_hint = parse_date_hint_from_name(child.name)
-            candidates.append(ExportCandidate(child, "dir", date_hint, st.st_mtime))
-
-    return candidates
-
-def pick_latest_candidate(candidates: List[ExportCandidate]) -> Optional[ExportCandidate]:
+def find_conversations_json(root: Path) -> Path:
+    # Typical export has conversations.json at root; allow nested.
+    candidates = []
+    for p in root.rglob("conversations.json"):
+        candidates.append(p)
     if not candidates:
-        return None
-
-    def key(c: ExportCandidate):
-        # Prefer parsed date; fallback to mtime
-        # date sorts lexicographically as YYYY-MM-DD.
-        return (c.date_hint or "", c.mtime)
-
-    # We want the max; but date_hint "" should be lowest.
-    return max(candidates, key=key)
+        raise FileNotFoundError("Could not find conversations.json in export.")
+    # Prefer the shallowest path
+    candidates.sort(key=lambda p: len(p.parts))
+    return candidates[0]
 
 
-# ----------------------------
-# Normalization (zip/folder -> staging)
-# ----------------------------
+def extract_if_zip(src: Path) -> Path:
+    if src.is_dir():
+        return src
+    if src.suffix.lower() == ".zip":
+        tmp = Path(tempfile.mkdtemp(prefix="chatgpt_export_"))
+        with zipfile.ZipFile(src, "r") as z:
+            z.extractall(tmp)
+        return tmp
+    raise ValueError("Input must be a directory or a .zip file")
 
-def normalize_to_staging(source: Path, staging_dir: Path) -> Dict[str, Any]:
+
+def role_to_actor_type(role: str) -> str:
+    r = (role or "").lower()
+    if r == "user":
+        return "human"
+    if r == "assistant":
+        return "assistant"
+    # chat exports may contain "system"/"tool"
+    if r in ("system", "tool"):
+        return "system"
+    return "system"
+
+
+def message_text_parts(message: Dict[str, Any]) -> List[Tuple[str, str]]:
     """
-    Normalize the export into staging_dir.
-    Returns basic provenance info (source path, type, extracted file list stats).
+    Returns list of (mime_type, text) parts in stable order.
     """
-    ensure_clean_dir(staging_dir)
+    content = (message or {}).get("content") or {}
+    ctype = content.get("content_type")
+    parts = content.get("parts")
 
-    provenance: Dict[str, Any] = {
-        "source_path": str(source),
-        "source_kind": "zip" if source.is_file() and source.suffix.lower() == ".zip" else "dir",
-        "normalized_at": now_utc_iso(),
-    }
-
-    if provenance["source_kind"] == "zip":
-        with zipfile.ZipFile(source, "r") as zf:
-            zf.extractall(staging_dir)
-            provenance["zip_namelist_count"] = len(zf.namelist())
-    else:
-        shutil.copytree(source, staging_dir, dirs_exist_ok=True)
-
-    # Locate conversations.json within staging
-    conv = find_conversations_json_in_dir(staging_dir)
-    if not conv:
-        raise SystemExit(f"Normalization succeeded but conversations.json not found in staging: {staging_dir}")
-
-    # If conversations.json is nested, copy it up to root for deterministic contract
-    if conv.parent != staging_dir:
-        shutil.copy2(conv, staging_dir / "conversations.json")
-        provenance["conversations_json_copied_from"] = str(conv)
-
-    # Optional: bring chat.html up too, if present
-    chat_html = next((p for p in staging_dir.rglob("chat.html") if p.is_file()), None)
-    if chat_html and chat_html.parent != staging_dir:
-        shutil.copy2(chat_html, staging_dir / "chat.html")
-        provenance["chat_html_copied_from"] = str(chat_html)
-
-    # Hash conversations.json
-    conv_root = staging_dir / "conversations.json"
-    provenance["conversations_json_sha256"] = sha256_file(conv_root)
-    provenance["staging_file_count"] = sum(1 for _ in iter_files_recursive(staging_dir))
-
-    return provenance
-
-
-# ----------------------------
-# Parsing conversations.json
-# ----------------------------
-
-def normalize_conversations_root(obj: Json) -> List[dict]:
-    """
-    Exports vary:
-      - list[conversation]
-      - dict with keys like "conversations" / "data" / "items"
-    """
-    if isinstance(obj, list):
-        return [x for x in obj if isinstance(x, dict)]
-    if isinstance(obj, dict):
-        for k in ("conversations", "data", "items"):
-            v = obj.get(k)
-            if isinstance(v, list):
-                return [x for x in v if isinstance(x, dict)]
-        return [obj]
-    return []
-
-def extract_author(message_obj: dict) -> Tuple[Optional[str], Optional[str]]:
-    author = message_obj.get("author") or {}
-    if not isinstance(author, dict):
-        return None, None
-    role = author.get("role") or author.get("type")
-    name = author.get("name")
-    return role, name
-
-def extract_message_text(message_obj: dict) -> Tuple[Optional[str], Optional[str], List[str]]:
-    """
-    Returns content_type, joined_text, parts list.
-    Handles common text shapes in exports. Non-text content stays None.
-    """
-    content = message_obj.get("content") or {}
-    if not isinstance(content, dict):
-        return None, None, []
-
-    ctype = content.get("content_type") or content.get("type")
-    parts: List[str] = []
-
-    raw_parts = content.get("parts")
-    if isinstance(raw_parts, list):
-        for p in raw_parts:
-            if p is None:
+    out: List[Tuple[str, str]] = []
+    if isinstance(parts, list):
+        # Most common: parts is list of strings
+        for s in parts:
+            if s is None:
                 continue
-            if isinstance(p, str):
-                parts.append(p)
-            elif isinstance(p, dict):
-                t = p.get("text")
-                if isinstance(t, str):
-                    parts.append(t)
+            out.append(("text/plain", str(s)))
+        return out
 
-    if not parts:
-        t = content.get("text")
-        if isinstance(t, str):
-            parts = [t]
+    # Fallback: if content is string-like
+    if isinstance(content, str):
+        out.append(("text/plain", content))
+        return out
 
-    joined = "\n".join(parts) if parts else None
-    return ctype, joined, parts
-
-def extract_conversation_core(conv: dict) -> dict:
-    return {
-        "conversation_id": conv.get("id") or conv.get("conversation_id"),
-        "title": conv.get("title"),
-        "create_time": utc_iso_from_export_ts(conv.get("create_time")),
-        "update_time": utc_iso_from_export_ts(conv.get("update_time")),
-        "current_node": conv.get("current_node"),
-        "metadata": conv.get("metadata") if isinstance(conv.get("metadata"), dict) else None,
-    }
-
-def flatten_messages_from_mapping(conv: dict) -> List[dict]:
-    """
-    Flatten nodes with non-null "message" from the mapping tree.
-    """
-    mapping = conv.get("mapping")
-    if not isinstance(mapping, dict):
-        return []
-
-    out: List[dict] = []
-    for node_id, node in mapping.items():
-        if not isinstance(node, dict):
-            continue
-        msg = node.get("message")
-        if not isinstance(msg, dict):
-            continue
-
-        role, name = extract_author(msg)
-        ctype, joined, parts = extract_message_text(msg)
-
-        out.append({
-            "node_id": node_id,
-            "message_id": msg.get("id") or node_id,
-            "parent_id": node.get("parent"),
-            "role": role,
-            "author_name": name,
-            "create_time": utc_iso_from_export_ts(msg.get("create_time") or node.get("create_time")),
-            "update_time": utc_iso_from_export_ts(msg.get("update_time") or node.get("update_time")),
-            "content_type": ctype,
-            "text": joined,
-            "parts": parts,
-            "status": msg.get("status"),
-            "metadata": msg.get("metadata") if isinstance(msg.get("metadata"), dict) else None,
-        })
-
-    def sort_key(m: dict):
-        return (m.get("create_time") or "", m.get("message_id") or "")
-
-    out.sort(key=sort_key)
+    # Unknown structure: store JSON
+    out.append(("application/json", json.dumps(content, ensure_ascii=False)))
     return out
 
 
-# ----------------------------
-# Schema signature (drift detection)
-# ----------------------------
-
-def build_schema_signature(conversations: List[dict], max_convs: int = 50) -> Dict[str, Any]:
-    conv_keys = set()
-    content_types = set()
-    content_keys = set()
-    author_keys = set()
-
-    for conv in conversations[:max_convs]:
-        conv_keys.update(conv.keys())
-        mapping = conv.get("mapping")
-        if not isinstance(mapping, dict):
-            continue
-        for _, node in list(mapping.items())[:200]:
-            if not isinstance(node, dict):
-                continue
-            msg = node.get("message")
-            if not isinstance(msg, dict):
-                continue
-            content = msg.get("content")
-            if isinstance(content, dict):
-                content_types.add(content.get("content_type") or content.get("type"))
-                content_keys.update(content.keys())
-            author = msg.get("author")
-            if isinstance(author, dict):
-                author_keys.update(author.keys())
-
-    def norm_set(s: set) -> List[str]:
-        return sorted([x for x in s if isinstance(x, str) and x])
-
-    return {
-        "conversation_keys": sorted(list(conv_keys)),
-        "message_content_types": norm_set(content_types),
-        "message_content_keys": sorted(list(content_keys)),
-        "message_author_keys": sorted(list(author_keys)),
-    }
+def iter_nodes(conversation: Dict[str, Any]) -> Iterable[Tuple[str, Dict[str, Any]]]:
+    mapping = conversation.get("mapping") or {}
+    for node_id, node in mapping.items():
+        yield node_id, node
 
 
-# ----------------------------
-# SQLite DB
-# ----------------------------
-
-SCHEMA_SQL = """
-PRAGMA journal_mode=WAL;
-PRAGMA foreign_keys=ON;
-
-CREATE TABLE IF NOT EXISTS conversations (
-  conversation_id TEXT PRIMARY KEY,
-  title TEXT,
-  create_time TEXT,
-  update_time TEXT,
-  current_node TEXT,
-  metadata_json TEXT
-);
-
--- Uniqueness: within a conversation, node_id should be stable across exports.
-CREATE TABLE IF NOT EXISTS messages (
-  id INTEGER PRIMARY KEY AUTOINCREMENT,
-  conversation_id TEXT NOT NULL,
-  node_id TEXT NOT NULL,
-  message_id TEXT,
-  parent_id TEXT,
-  role TEXT,
-  author_name TEXT,
-  create_time TEXT,
-  update_time TEXT,
-  content_type TEXT,
-  text TEXT,
-  status TEXT,
-  metadata_json TEXT,
-  UNIQUE(conversation_id, node_id),
-  FOREIGN KEY(conversation_id) REFERENCES conversations(conversation_id)
-);
-
-CREATE INDEX IF NOT EXISTS idx_messages_conv_time
-ON messages(conversation_id, create_time);
-
-CREATE TABLE IF NOT EXISTS message_content_parts (
-  message_row_id INTEGER NOT NULL,
-  part_index INTEGER NOT NULL,
-  part_text TEXT,
-  PRIMARY KEY(message_row_id, part_index),
-  FOREIGN KEY(message_row_id) REFERENCES messages(id)
-);
-"""
-
-def connect_db(db_path: Path) -> sqlite3.Connection:
-    db_path.parent.mkdir(parents=True, exist_ok=True)
+def open_db(db_path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(str(db_path))
-    conn.executescript(SCHEMA_SQL)
+    conn.execute("PRAGMA foreign_keys = ON;")
     return conn
 
 
-def clear_core_tables(conn: sqlite3.Connection) -> None:
-    """Delete all rows from core ingest tables so a run is deterministic/idempotent.
-
-    This is the safest default for full re-ingest from a fresh ChatGPT export.
-    """
-    conn.execute("PRAGMA foreign_keys = OFF;")
-    # Delete children first, then parents.
-    for tbl in ("message_content_parts", "messages", "conversations"):
-        conn.execute(f"DELETE FROM {tbl};")
-    conn.execute("PRAGMA foreign_keys = ON;")
-
-def upsert_conversation(conn: sqlite3.Connection, c: dict) -> None:
-    conn.execute(
-        """
-        INSERT INTO conversations(conversation_id, title, create_time, update_time, current_node, metadata_json)
-        VALUES (?, ?, ?, ?, ?, ?)
-        ON CONFLICT(conversation_id) DO UPDATE SET
-          title=excluded.title,
-          create_time=excluded.create_time,
-          update_time=excluded.update_time,
-          current_node=excluded.current_node,
-          metadata_json=excluded.metadata_json
-        """,
-        (
-            c["conversation_id"],
-            c.get("title"),
-            c.get("create_time"),
-            c.get("update_time"),
-            c.get("current_node"),
-            json.dumps(c.get("metadata")) if c.get("metadata") is not None else None,
-        ),
-    )
-
-def upsert_message(conn: sqlite3.Connection, conversation_id: str, m: dict) -> int:
-    """
-    Upsert by (conversation_id, node_id). Returns row id.
-    """
-    conn.execute(
-        """
-        INSERT INTO messages(
-          conversation_id, node_id, message_id, parent_id, role, author_name,
-          create_time, update_time, content_type, text, status, metadata_json
-        )
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-        ON CONFLICT(conversation_id, node_id) DO UPDATE SET
-          message_id=excluded.message_id,
-          parent_id=excluded.parent_id,
-          role=excluded.role,
-          author_name=excluded.author_name,
-          create_time=excluded.create_time,
-          update_time=excluded.update_time,
-          content_type=excluded.content_type,
-          text=excluded.text,
-          status=excluded.status,
-          metadata_json=excluded.metadata_json
-        """,
-        (
-            conversation_id,
-            m.get("node_id"),
-            m.get("message_id"),
-            m.get("parent_id"),
-            m.get("role"),
-            m.get("author_name"),
-            m.get("create_time"),
-            m.get("update_time"),
-            m.get("content_type"),
-            m.get("text"),
-            m.get("status"),
-            json.dumps(m.get("metadata")) if m.get("metadata") is not None else None,
-        ),
-    )
-
-    # Fetch row id
-    cur = conn.execute(
-        "SELECT id FROM messages WHERE conversation_id=? AND node_id=?",
-        (conversation_id, m.get("node_id")),
-    )
-    row = cur.fetchone()
-    if not row:
-        raise RuntimeError("Failed to retrieve upserted message row id.")
-    return int(row[0])
-
-def replace_parts(conn: sqlite3.Connection, message_row_id: int, parts: List[str]) -> None:
-    # Replace deterministically
-    conn.execute("DELETE FROM message_content_parts WHERE message_row_id=?", (message_row_id,))
-    for i, p in enumerate(parts):
-        conn.execute(
-            "INSERT INTO message_content_parts(message_row_id, part_index, part_text) VALUES (?, ?, ?)",
-            (message_row_id, i, p),
+def ensure_capture_schema(conn: sqlite3.Connection) -> None:
+    # Fail fast if schema missing (migration not applied)
+    required = {"capture_events", "capture_payload_parts"}
+    rows = conn.execute(
+        "SELECT name FROM sqlite_master WHERE type='table';"
+    ).fetchall()
+    existing = {r[0] for r in rows}
+    missing = required - existing
+    if missing:
+        raise RuntimeError(
+            f"iam.db missing capture schema tables: {sorted(missing)}. "
+            "Apply migrations/0001_capture_contract.sql first."
         )
 
 
-# ----------------------------
-# Ingestion pipeline
-# ----------------------------
-
-def ingest_conversations_json(
+def insert_capture_event(
     conn: sqlite3.Connection,
-    conversations_obj: Json,
-) -> Tuple[int, int]:
-    conversations = normalize_conversations_root(conversations_obj)
-
-    conv_count = 0
-    msg_count = 0
-
-    for conv in conversations:
-        ccore = extract_conversation_core(conv)
-        cid = ccore.get("conversation_id")
-        if not cid:
-            continue
-
-        upsert_conversation(conn, ccore)
-        conv_count += 1
-
-        msgs = flatten_messages_from_mapping(conv)
-        for m in msgs:
-            row_id = upsert_message(conn, cid, m)
-            msg_count += 1
-            parts = m.get("parts") or []
-            if parts:
-                replace_parts(conn, row_id, parts)
-
-    conn.commit()
-    return conv_count, msg_count
-
-
-# ----------------------------
-# CLI
-# ----------------------------
-
-def repo_root_from_script_location() -> Path:
-    # script is expected at code/ingest/ingest_chatgpt_export.py
-    return Path(__file__).resolve().parents[2]
-
-
-def build_message_text_and_canonical_view(conn: sqlite3.Connection) -> None:
-    """Build deterministic message text and a canonical view.
-
-    Why:
-    - Some messages store their text in message_content_parts (multi-part content).
-    - Some rows have no parts at all (e.g., tool messages, redactions, placeholders).
-
-    Outcome:
-    - message_text: one row per message_row_id with either concatenated text or NULL.
-    - message_canonical: a stable view joining messages + message_text.
-
-    This is SAFE to re-run; it drops/recreates message_text and message_canonical each time.
+    source_ref: str,
+    source_event_key: str,
+    actor_type: str,
+    observed_ts: Optional[str],
+    payload_kind: str = "multipart",
+) -> Optional[int]:
     """
-    cur = conn.cursor()
-    cur.executescript(
+    Insert capture event idempotently. Returns capture_id if inserted or existing.
+    """
+    # Insert (idempotent)
+    conn.execute(
         """
-        DROP VIEW IF EXISTS message_canonical;
-        DROP TABLE IF EXISTS message_text;
-
-        CREATE TABLE message_text (
-          message_row_id INTEGER PRIMARY KEY,
-          text           TEXT,
-          source         TEXT NOT NULL,   -- 'parts' | 'none'
-          char_count     INTEGER NOT NULL,
-          FOREIGN KEY(message_row_id) REFERENCES messages(id)
-        );
-        """
+        INSERT OR IGNORE INTO capture_events
+          (source_type, source_ref, source_event_key, actor_type, observed_ts, ingested_ts, payload_kind)
+        VALUES
+          (?, ?, ?, ?, ?, ?, ?)
+        """,
+        (SOURCE_TYPE, source_ref, source_event_key, actor_type, observed_ts, utc_now_iso(), payload_kind),
     )
-
-    # 1) Build from parts (ordered concatenation)
-    cur.executescript(
+    # Fetch capture_id (existing or inserted)
+    row = conn.execute(
         """
-        INSERT INTO message_text (message_row_id, text, source, char_count)
-        SELECT
-          message_row_id,
-          GROUP_CONCAT(part_text, '') AS text,
-          'parts' AS source,
-          LENGTH(GROUP_CONCAT(part_text, '')) AS char_count
-        FROM (
-          SELECT message_row_id, part_index, part_text
-          FROM message_content_parts
-          ORDER BY message_row_id, part_index
+        SELECT capture_id FROM capture_events
+        WHERE source_type=? AND source_ref=? AND source_event_key=?
+        """,
+        (SOURCE_TYPE, source_ref, source_event_key),
+    ).fetchone()
+    return int(row[0]) if row else None
+
+
+def insert_payload_parts(conn: sqlite3.Connection, capture_id: int, parts: List[Tuple[str, str]]) -> None:
+    for idx, (mime, text) in enumerate(parts):
+        conn.execute(
+            """
+            INSERT OR IGNORE INTO capture_payload_parts
+              (capture_id, part_index, mime_type, text)
+            VALUES
+              (?, ?, ?, ?)
+            """,
+            (capture_id, idx, mime, text),
         )
-        GROUP BY message_row_id;
 
-        -- 2) For messages with no parts, create a deterministic NULL text row.
-        INSERT INTO message_text (message_row_id, text, source, char_count)
-        SELECT
-          m.id AS message_row_id,
-          NULL AS text,
-          'none' AS source,
-          0 AS char_count
-        FROM messages m
-        WHERE NOT EXISTS (
-          SELECT 1 FROM message_text mt WHERE mt.message_row_id = m.id
-        );
-
-        -- 3) Canonical view: always use message_text.text (never messages.text).
-        CREATE VIEW message_canonical AS
-        SELECT
-          m.id                AS message_row_id,
-          m.conversation_id,
-          m.node_id,
-          m.message_id,
-          m.parent_id,
-          m.role,
-          m.author_name,
-          m.create_time,
-          m.update_time,
-          m.content_type,
-          mt.text             AS text,
-          mt.source           AS text_source,
-          mt.char_count       AS text_char_count,
-          m.status,
-          m.metadata_json
-        FROM messages m
-        JOIN message_text mt
-          ON mt.message_row_id = m.id;
-        """
-    )
 
 def main() -> None:
-    parser = argparse.ArgumentParser(description="Ingest ChatGPT export into SQLite DB (zip or folder).")
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--in", dest="inp", required=True, help="Path to ChatGPT export (.zip or directory)")
+    ap.add_argument("--db", dest="db", required=True, help="Path to iam.db")
+    args = ap.parse_args()
 
-    parser.add_argument("--repo-root", type=str, default=None, help="Repo root (defaults to script-derived).")
-    parser.add_argument("--inbox", type=str, default=None, help="Inbox directory holding zips/folders.")
-    parser.add_argument("--source", type=str, default=None, help="Specific zip or folder to ingest (overrides discovery).")
-    parser.add_argument("--staging", type=str, default=None, help="Staging directory (normalized export).")
-    parser.add_argument("--db", type=str, default=None, help="Output SQLite DB path.")
-    parser.add_argument("--keep-staging", action="store_true", help="Do not delete staging dir after ingest.")
-    parser.add_argument("--dry-run", action="store_true", help="Normalize + validate only; do not ingest to DB.")
-    parser.add_argument("--append", action="store_true", help="Append/update without clearing existing DB tables first")
-    parser.add_argument("--no-canonicalize", action="store_true", help="Skip building message_text table and message_canonical view")
-    args = parser.parse_args()
+    src = Path(args.inp).expanduser().resolve()
+    db_path = Path(args.db).expanduser().resolve()
 
-    repo_root = Path(args.repo_root).resolve() if args.repo_root else repo_root_from_script_location()
+    root = extract_if_zip(src)
+    conversations_path = find_conversations_json(root)
 
-    inbox_dir = Path(args.inbox).resolve() if args.inbox else (repo_root / "data" / "inbox" / "chatgpt_export")
-    staging_dir = Path(args.staging).resolve() if args.staging else (repo_root / "data" / "staging" / "chatgpt_export_latest")
-    db_path = Path(args.db).resolve() if args.db else (repo_root / "data" / "artifacts" / "iam.db")
+    conversations = json.loads(conversations_path.read_text(encoding="utf-8"))
 
-    # Choose source
-    source: Optional[Path] = None
-    if args.source:
-        source = Path(args.source).resolve()
-        if not source.exists():
-            raise SystemExit(f"--source not found: {source}")
-    else:
-        candidates = discover_candidates(inbox_dir)
-        chosen = pick_latest_candidate(candidates)
-        if not chosen:
-            raise SystemExit(f"No export candidates found in inbox: {inbox_dir}\n"
-                             f"Put a .zip or an export folder containing conversations.json there, or pass --source.")
-        source = chosen.path
+    conn = open_db(db_path)
+    ensure_capture_schema(conn)
 
-    # Normalize
-    provenance = normalize_to_staging(source, staging_dir)
-    conv_path = staging_dir / "conversations.json"
-    conversations_obj = read_json(conv_path)
-    conversations = normalize_conversations_root(conversations_obj)
+    # conversations.json is typically a list
+    if not isinstance(conversations, list):
+        raise ValueError("Unexpected conversations.json structure (expected list).")
 
-    schema_sig = build_schema_signature(conversations)
-    # Basic counts (best-effort)
-    conv_count_est = len(conversations)
-    msg_count_est = 0
-    for conv in conversations[:200]:
-        mapping = conv.get("mapping")
-        if isinstance(mapping, dict):
-            for _, node in mapping.items():
-                if isinstance(node, dict) and isinstance(node.get("message"), dict):
-                    msg_count_est += 1
+    ingested = 0
+    for conv in conversations:
+        conv_id = conv.get("id") or conv.get("conversation_id")
+        if not conv_id:
+            continue
 
-    manifest = {
-        "source": "chatgpt_export",
-        "repo_root": str(repo_root),
-        "inbox_dir": str(inbox_dir),
-        "staging_dir": str(staging_dir),
-        "db_path": str(db_path),
-        "provenance": provenance,
-        "counts_estimate": {
-            "conversations": conv_count_est,
-            "messages_sampled": msg_count_est,
-        },
-        "schema_signature": schema_sig,
-        "validated_at": now_utc_iso(),
-    }
-    write_json(staging_dir / "export_manifest.json", manifest)
+        for node_id, node in iter_nodes(conv):
+            msg = node.get("message")
+            if not msg:
+                continue
 
-    # Validate minimum invariant
-    if not conv_path.exists():
-        raise SystemExit("Invariant failed: staging/conversations.json missing.")
-    if conv_count_est == 0:
-        raise SystemExit("Invariant failed: conversations.json parsed but yielded 0 conversations (schema mismatch?).")
+            author = msg.get("author") or {}
+            role = author.get("role") or ""
+            actor_type = role_to_actor_type(role)
 
-    if args.dry_run:
-        print("Dry run OK.")
-        print(f"Source:   {source}")
-        print(f"Staging:  {staging_dir}")
-        print(f"DB:       {db_path} (not written)")
-        print(f"Convs:    {conv_count_est:,}  (estimated messages sampled: {msg_count_est:,})")
-        return
+            # observed timestamp: best-effort
+            observed_ts = None
+            # exports can include create_time as float seconds
+            ct = msg.get("create_time")
+            try:
+                if ct is not None:
+                    observed_ts = datetime.fromtimestamp(float(ct), tz=timezone.utc).isoformat(timespec="seconds")
+            except Exception:
+                observed_ts = None
 
-    # Ingest
-    conn = connect_db(db_path)
+            capture_id = insert_capture_event(
+                conn=conn,
+                source_ref=str(conv_id),
+                source_event_key=str(node_id),
+                actor_type=actor_type,
+                observed_ts=observed_ts,
+                payload_kind="multipart",
+            )
+            if capture_id is None:
+                continue
 
-    # By default we do a full rebuild so results are deterministic and repeatable.
-    # Use --append if you intentionally want to keep/merge prior ingests.
-    if not args.append:
-        clear_core_tables(conn)
-
-    conv_count, msg_count = ingest_conversations_json(conn, conversations_obj)
-
-    # Post-ingest canonicalization (safe to rerun)
-    if not args.no_canonicalize:
-        build_message_text_and_canonical_view(conn)
+            parts = message_text_parts(msg)
+            insert_payload_parts(conn, capture_id, parts)
+            ingested += 1
 
     conn.commit()
     conn.close()
+    print(f"Ingested (idempotent) messages processed: {ingested}")
 
-    print("Ingest complete.")
-    print(f"Source:   {source}")
-    print(f"Staging:  {staging_dir}")
-    print(f"DB:       {db_path}")
-    print(f"Inserted/Upserted conversations: {conv_count:,}")
-    print(f"Inserted/Upserted messages:      {msg_count:,}")
-
-    if not args.keep_staging:
-        # Keep only manifest + conversations.json by default? Here: delete staging entirely for privacy.
-        # If you prefer to keep staging, use --keep-staging.
-        shutil.rmtree(staging_dir, ignore_errors=True)
 
 if __name__ == "__main__":
     main()
