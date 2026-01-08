@@ -1,10 +1,7 @@
-# MAP — Repository Authority and Alignment
+# MAP
 
-This document defines the structural map of the repository: how its components relate, where authority resides, and how contradictions are resolved.
-
-## Unifying concern
-
-The unifying concern is preservation of human continuity of thought over time (being-in-time as preserved temporal intelligibility), in environments increasingly mediated by automation.
+This repository uses language as infrastructure.
+If a file is not in this map, it is either supporting material or non-authoritative.
 
 ## Authority order (highest → lowest)
 
@@ -16,21 +13,25 @@ The unifying concern is preservation of human continuity of thought over time (b
 6) `residue/` — supporting artifacts  
 7) `code/` — non-authoritative prototypes
 
-If contradictions exist, resolve upward. Lower layers adapt to higher layers.
+If contradictions exist, higher authority wins.
 
-## Key governing documents
+## Governing texts
 
-- `language-as-infrastructure.md` — repo-level continuity discipline
 - `architecture/invariants.md` — non-negotiable invariants
-- `architecture/overview.md` — system identity
+- `architecture/continuity-operating-contract.md` — operational guardrails
 - `architecture/continuity-strata.md` — dependency strata (replaces “levels as folder” ambiguity)
 - `architecture/ingestion-pipeline.md` — adapter → iam.db → provdb → subdb narrative
-- `architecture/migrations.md` — evolution policy
-- `migrations/*.sql` — executable schema law (capture contract)
-- `architecture/node-projections.md — node layers, parallel pairings, SubDB node contract
+- `architecture/Migrations.md` — evolution policy
+- `Migrations/*.sql` — executable schema law (capture contract)
+- `architecture/node-projections.md` — node layers, parallel pairings, SubDB node contract
 
 ## Evolution rule
 
 - Capture/originals are append-only.
 - Derived artifacts are rebuildable and versioned.
-- Prompts are interpreters over the corpus, not authorities.
+- Prompts are interpreters over the corpus, not authors of authority.
+- CAP composes ephemerally and never persists composition.
+
+## Working expectation
+
+All changes should be traceable to the governing texts above.
