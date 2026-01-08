@@ -56,7 +56,8 @@ SubDB is responsible for:
 - executing path traversal
 - executing differential geometry using ProvDB-defined metrics
 
-A path is a curve or ordered sequence through SubDB in node coordinate space.
+A path is a geometric curve or ordered sequence through SubDB
+in node coordinate space.
 
 SubDB answers:
 
@@ -89,6 +90,10 @@ Semantic DB answers:
 ## 4. Mapping Contract
 
 The mapping between layers is explicit and identity-based.
+
+
+
+
 
 The manifold exists only in SubDB.
 
