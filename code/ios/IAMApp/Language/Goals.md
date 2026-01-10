@@ -15,6 +15,7 @@ Sharing is explicit and user-controlled, using OS-level sharing mechanisms compa
 
 ## Model Usage
 
-The app may use Apple Foundation Models for local inference.
+The app may use Apple Foundation Models for local inference as an optional implementation detail. No framework defines correctness.
+
 The app may also issue one-shot inference requests to external LLM endpoints when credentials are present and explicitly configured.
 External inference must remain optional and must not be required for substrate correctness.
