@@ -37,6 +37,7 @@ Legibility addresses this failure mode.
 ## Core Requirements
 
 ### R1. Re-Entry Without Reconstruction
+
 A legible system MUST allow a human to re-enter an unfinished path as continuation,
 not as retrospective explanation.
 
@@ -48,6 +49,7 @@ Re-entry must restore:
 Summaries, explanations, or coherence alone do not satisfy this requirement.
 
 ### R2. Perspective Mobility Without Rupture
+
 A legible system MUST support multiple perspectives over the same continuity
 without breaking identity or forcing reconstruction.
 
@@ -59,6 +61,7 @@ At minimum, the map MUST support:
 Perspective change MUST be reversible.
 
 ### R3. Shape Preservation
+
 The map MUST expose the global shape that emerges from continuity in semantic space.
 This includes:
 - non-local proximity,
@@ -68,6 +71,7 @@ This includes:
 Linear timelines alone are insufficient.
 
 ### R4. Substrate / Meaning Separation
+
 The substrate MUST hold shape independently of interpretation.
 Meaning MUST be supplied by the human through client-defined coordinates and metric.
 
@@ -77,6 +81,7 @@ Legibility MUST NOT require:
 - model-centric explanations.
 
 ### R5. Personal Scope
+
 Legibility is scoped to a single human’s continuity.
 Maps MUST NOT aggregate, average, or generalize across users.
 
@@ -115,9 +120,9 @@ A system satisfies legibility if a returning human can:
 
 ## Relationship to Other Specifications
 
-- This document depends on `continuity-manifold-model.md`
-- This document constrains projections described in `node-projections.md`
-- This document operationalizes premises stated in `writing/OVERVIEW.md`
+- This document depends on `architecture/continuity-manifold-model.md`
+- This document constrains projections described in `architecture/node-projections.md`
+- This document operationalizes premises stated in `writing/overview.md`
 
 Legibility does not introduce new primitives.
 It specifies how existing continuity must be made usable.
