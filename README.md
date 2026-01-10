@@ -1,3 +1,7 @@
+
+## Language as Infrastructure
+
+This repository treats language as infrastructure: goals, constraints, and invariants are defined in natural language so that humans and language models can generate and evaluate artifacts coherently over time without reconstruction.
 # IAM Core
 
 This repository presents a coherent body of work concerned with the preservation of human reasoning continuity under conditions increasingly shaped by automated and agentic systems.

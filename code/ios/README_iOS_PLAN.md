@@ -1,22 +1,10 @@
-# IAM iOS App — Deferred Implementation Plan
+# iOS Prototype (Non-Authoritative)
 
-## Status
-**INTENTIONALLY DEFERRED**
+This folder contains a non-authoritative prototype. It exists to reduce repository claims to practice and test feasibility.
 
-The iOS app work is intentionally paused while the desktop / script-based
-ingestion pipeline is stabilized and finalized.
+The repository is governed upstream by `writing/` and `architecture/`. Do not treat application code as defining goals, constraints, or premises.
 
-Do **not** modify the existing Apple sample app or introduce IAM-specific
-changes until the ingestion invariants described below are complete and
-repeatable.
-
-This file exists to:
-- Preserve design intent
-- Prevent premature UI or storage decisions
-- Ensure the iOS app mirrors the ingestion substrate correctly
-
----
-
-## Current iOS Context
-
-- `IAMApp` (Apple Foundation Models sample) lives under:
+See:
+- `writing/OVERVIEW.md` for structural premises
+- `writing/essays/` for consequences and arguments
+- `architecture/` for system invariants

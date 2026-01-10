@@ -33,8 +33,7 @@ def git(cmd):
 def main():
     repo_root = git(["git", "rev-parse", "--show-toplevel"])
 
-    timestamp = datetime.now().strftime("%Y%m%d-%H%M%S")
-    out_name = f"augmented-agency-ingest-md-py-{timestamp}.zip"
+    out_name = f"augmented-agency-ingest-md-py.zip"
     out_path = os.path.join(repo_root, out_name)
 
     # tracked files
