@@ -1,274 +1,193 @@
-#!/usr/bin/env python3
-"""
-Build a minimal static site for IAM writings from Markdown.
-
-Inputs (authoritative):
-- writing/index.yaml   (navigation + ordering + titles)
-- writing/*.md         (essay content)
-
-Outputs:
-- site/index.html
-- site/style.css
-- site/writings/*.html
-
-Design goals:
-- Deterministic output (no timestamps)
-- Simple templates
-- No JS, no frameworks
-"""
-
-from __future__ import annotations
-
-import argparse
-import html
 import os
+import html
+import yaml
 from pathlib import Path
 
-import yaml  # pip install pyyaml
-import markdown  # pip install markdown
+# -----------------------------
+# Paths
+# -----------------------------
+
+ROOT = Path(__file__).resolve().parent.parent
+WRITING_DIR = ROOT / "writing"
+ESSAYS_DIR = WRITING_DIR / "essays"
+OUTPUT_DIR = ROOT / "docs"
+STYLE_PATH = "../style.css"
 
 
-STYLE_CSS = """\
-:root { color-scheme: light dark; }
-body {
-  margin: 0;
-  font: 16px/1.65 system-ui, -apple-system, Segoe UI, Roboto, Helvetica, Arial, sans-serif;
-}
-.wrap { max-width: 820px; margin: 0 auto; padding: 28px; }
-h1 { font-size: 28px; margin: 0 0 8px; }
-.lede { margin: 0; opacity: 0.88; }
-h2 { margin-top: 28px; font-size: 18px; }
-a { text-decoration: none; }
-a:hover { text-decoration: underline; }
-.note { font-size: 14px; opacity: 0.8; margin: 4px 0 12px; }
-ol, ul { padding-left: 20px; }
-hr { border: 0; border-top: 1px solid rgba(127,127,127,0.25); margin: 22px 0; }
-code { font-size: 0.95em; }
-.small { font-size: 14px; opacity: 0.8; }
-"""
+# -----------------------------
+# Markdown rendering (robust)
+# -----------------------------
 
-INDEX_TEMPLATE = """\
-<!doctype html>
-<html lang="en">
+def load_markdown_renderer():
+    try:
+        import markdown
+        return lambda text: markdown.markdown(text, extensions=["fenced_code"])
+    except ImportError:
+        try:
+            import markdown2
+            return lambda text: markdown2.markdown(text)
+        except ImportError:
+            try:
+                import mistune
+                return lambda text: mistune.html(text)
+            except ImportError:
+                return lambda text: "<pre>" + html.escape(text) + "</pre>"
+
+render_md = load_markdown_renderer()
+
+
+# -----------------------------
+# Templates
+# -----------------------------
+
+INDEX_TEMPLATE = """<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{title}</title>
-  <link rel="stylesheet" href="./style.css" />
+<meta charset="utf-8">
+<title>{title}</title>
+<link rel="stylesheet" href="{style}">
 </head>
 <body>
-  <header class="wrap">
-	<h1>{h1}</h1>
-	<p class="lede">{lede}</p>
-  </header>
 
-  <main class="wrap">
-	<section>
-	  <h2>Start here</h2>
-	  <ol>
-		{start_here_items}
-	  </ol>
-	</section>
+<h1>{h1}</h1>
+<p>{lede}</p>
 
-	<section>
-	  <h2>All writings</h2>
-	  <ul>
-		{all_items}
-	  </ul>
-	</section>
+<h2>{start_section_title}</h2>
+{start_here_items}
 
-	<hr />
+<h2>{all_section_title}</h2>
+{all_items}
 
-	<section>
-	  <h2>Repository</h2>
-	  <p class="small">
-		The writings are upstream of architecture and code. For authority boundaries, see <code>MAP.md</code>.
-	  </p>
-	</section>
-  </main>
 </body>
 </html>
 """
 
-WRITING_TEMPLATE = """\
-<!doctype html>
-<html lang="en">
+ESSAY_TEMPLATE = """<!DOCTYPE html>
+<html>
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>{page_title}</title>
-  <link rel="stylesheet" href="../style.css" />
+<meta charset="utf-8">
+<title>{title}</title>
+<link rel="stylesheet" href="{style}">
 </head>
 <body>
-  <header class="wrap">
-	<p><a href="../index.html">← Back</a></p>
-	<h1>{h1}</h1>
-	<p class="small">{meta}</p>
-  </header>
 
-  <main class="wrap">
-	<article>
-	  {content_html}
-	</article>
-  </main>
+<h1>{title}</h1>
+{notes}
+{content}
+
 </body>
 </html>
 """
 
 
-def slug_from_md_path(md_path: str) -> str:
-	# writing/foo-bar.md -> foo-bar.html
-	base = Path(md_path).name
-	if base.lower().endswith(".md"):
-		base = base[:-3]
-	return f"{base}.html"
+# -----------------------------
+# Load index.yaml
+# -----------------------------
+
+def load_index():
+    index_path = WRITING_DIR / "index.yaml"
+    if not index_path.exists():
+        raise FileNotFoundError("Missing writing/index.yaml")
+    with open(index_path, "r", encoding="utf-8") as f:
+        return yaml.safe_load(f)
 
 
-def load_index_yaml(index_path: Path) -> dict:
-	data = yaml.safe_load(index_path.read_text(encoding="utf-8"))
-	if not isinstance(data, dict):
-		raise ValueError("index.yaml must parse to a mapping/object.")
-	return data
+# -----------------------------
+# Essay helpers
+# -----------------------------
+
+def read_essay(path):
+    if not path.exists():
+        raise FileNotFoundError(f"Essay not found: {path}")
+    return path.read_text(encoding="utf-8")
 
 
-def md_to_html(md_text: str) -> str:
-	# Keep it minimal and predictable.
-	md = markdown.Markdown(
-		extensions=[
-			"extra",        # tables, fenced_code, etc.
-			"sane_lists",
-			"toc",          # optional; doesn't show unless you include [TOC]
-		],
-		output_format="html5",
-	)
-	return md.convert(md_text)
+def write_html(path, html_text):
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(html_text, encoding="utf-8")
 
 
-def build_site(repo_root: Path, out_dir: Path, site_title: str) -> None:
-	index_yaml_path = repo_root / "writing" / "index.yaml"
-	if not index_yaml_path.exists():
-		raise FileNotFoundError(f"Missing {index_yaml_path}")
+# -----------------------------
+# Build site
+# -----------------------------
 
-	idx = load_index_yaml(index_yaml_path)
+def build_writings():
+    idx = load_index()
 
-	writings = idx.get("writings", [])
-	drafts = idx.get("drafts", [])
+    writings = idx.get("writings", [])
+    site_title = idx.get("site", {}).get("title", "IAM — Writings")
 
-	if not isinstance(writings, list):
-		raise ValueError("index.yaml: 'writings' must be a list")
-	if drafts is not None and not isinstance(drafts, list):
-		raise ValueError("index.yaml: 'drafts' must be a list if present")
+    # -----------------------------
+    # SITE METADATA (THIS IS WHERE YOUR BLOCK GOES)
+    # -----------------------------
 
-	out_dir.mkdir(parents=True, exist_ok=True)
-	(out_dir / "writings").mkdir(parents=True, exist_ok=True)
+    site_meta = idx.get("site", {}) if isinstance(idx.get("site", {}), dict) else {}
 
-	# Write CSS
-	(out_dir / "style.css").write_text(STYLE_CSS, encoding="utf-8")
+    start_section_title = site_meta.get("start_section_title") or "Start here"
+    all_section_title = site_meta.get("all_section_title") or "All writings"
 
-	def normalize_entry(e: dict) -> dict:
-		# Required: id, path, title, status, authoritative, created
-		if not isinstance(e, dict):
-			raise ValueError("Each writing entry must be an object/map.")
-		for k in ("id", "path", "title", "status", "authoritative", "created"):
-			if k not in e:
-				raise ValueError(f"Missing required field '{k}' in entry: {e}")
-		return e
+    h1 = site_meta.get("h1") or "IAM — Writings"
+    lede = site_meta.get("lede") or (
+        "A small set of essays that motivate and constrain the IAM project: preserving and extending "
+        "human reasoning continuity in an environment increasingly shaped by automated and agentic systems."
+    )
 
-	writings_n = [normalize_entry(e) for e in writings]
-	drafts_n = [normalize_entry(e) for e in drafts] if drafts else []
+    # -----------------------------
+    # Render essays
+    # -----------------------------
 
-	# Helper: build HTML page for each writing
-	def render_entry_page(entry: dict, is_draft: bool) -> str:
-		md_path = repo_root / entry["path"]
-		if not md_path.exists():
-			raise FileNotFoundError(f"Missing writing file: {entry['path']}")
+    start_here_items = []
+    all_items = []
 
-		md_text = md_path.read_text(encoding="utf-8")
-		content_html = md_to_html(md_text)
+    for item in writings:
+        path = ROOT / item["path"]
+        slug = Path(item["path"]).stem
+        title = item["title"]
 
-		meta_bits = [
-			f"ID: {entry['id']}",
-			f"Status: {entry['status']}",
-			"Draft" if is_draft else "Authoritative" if entry.get("authoritative") else "Non-authoritative",
-			f"Created: {entry['created']}",
-		]
-		meta = " · ".join(html.escape(x) for x in meta_bits)
+        raw_md = read_essay(path)
+        body_html = render_md(raw_md)
 
-		return WRITING_TEMPLATE.format(
-			page_title=html.escape(entry["title"]),
-			h1=html.escape(entry["title"]),
-			meta=meta,
-			content_html=content_html,
-		)
+        notes_html = ""
+        if item.get("notes"):
+            notes_html = f"<p><em>{html.escape(item['notes'])}</em></p>"
 
-	# Write pages
-	all_entries = []
-	for entry in writings_n:
-		html_name = slug_from_md_path(entry["path"])
-		page_path = out_dir / "writings" / html_name
-		page_path.write_text(render_entry_page(entry, is_draft=False), encoding="utf-8")
-		all_entries.append((entry, html_name, False))
+        essay_html = ESSAY_TEMPLATE.format(
+            title=html.escape(title),
+            notes=notes_html,
+            content=body_html,
+            style=STYLE_PATH,
+        )
 
-	for entry in drafts_n:
-		html_name = slug_from_md_path(entry["path"])
-		page_path = out_dir / "writings" / html_name
-		page_path.write_text(render_entry_page(entry, is_draft=True), encoding="utf-8")
-		all_entries.append((entry, html_name, True))
+        output_path = OUTPUT_DIR / "writings" / f"{slug}.html"
+        write_html(output_path, essay_html)
 
-	# Build landing page lists
+        link_html = f"<p><a href='writings/{slug}.html'>{html.escape(title)}</a></p>"
 
-	# "Start here" = explicitly curated entries (Index.yaml: start_here: true)
-	start_here = [x for x in all_entries if (x[2] is False and x[0].get("start_here") is True)]
-	if not start_here:
-		# Fallback for older indexes: first 3 authoritative writings, in the order listed
-		start_here = [x for x in all_entries if x[2] is False][:3]
+        all_items.append(link_html)
+        if item.get("start_here"):
+            start_here_items.append(link_html)
+
+    # -----------------------------
+    # Render index page
+    # -----------------------------
+
+    index_html = INDEX_TEMPLATE.format(
+        title=html.escape(site_title),
+        h1=html.escape(h1),
+        lede=html.escape(lede),
+        start_section_title=html.escape(start_section_title),
+        all_section_title=html.escape(all_section_title),
+        start_here_items="\n".join(start_here_items),
+        all_items="\n".join(all_items),
+        style=STYLE_PATH,
+    )
+
+    write_html(OUTPUT_DIR / "index.html", index_html)
 
 
-	def li_link(entry: dict, html_name: str, note: str | None = None) -> str:
-		title = html.escape(entry["title"])
-		href = f'./writings/{html.escape(html_name)}'
-		if note:
-			return f'<li><a href="{href}">{title}</a><div class="note">{html.escape(note)}</div></li>'
-		return f'<li><a href="{href}">{title}</a></li>'
-
-	# Optional notes: use entry["notes"] if present in YAML
-	start_here_items = "\n        ".join(
-		li_link(e, html_name, (e.get("notes") or "").strip() or None)
-		for (e, html_name, _is_draft) in start_here
-	)
-
-	all_items = "\n        ".join(
-		li_link(e, html_name)
-		for (e, html_name, _is_draft) in all_entries
-	)
-
-	index_html = INDEX_TEMPLATE.format(
-		title=html.escape(site_title),
-		h1="IAM — Writings",
-		lede=(
-			"A small set of essays that motivate and constrain the IAM project: preserving and extending "
-			"human reasoning continuity in an environment increasingly shaped by automated and agentic systems."
-		),
-		start_here_items=start_here_items,
-		all_items=all_items,
-	)
-
-	(out_dir / "index.html").write_text(index_html, encoding="utf-8")
-
-
-def main() -> None:
-	ap = argparse.ArgumentParser()
-	ap.add_argument("--repo-root", default=".", help="Path to repo root (default: .)")
-	ap.add_argument("--out", default="site", help="Output directory (default: site)")
-	ap.add_argument("--title", default="IAM — Writings", help="Site title (default: IAM — Writings)")
-	args = ap.parse_args()
-
-	repo_root = Path(args.repo_root).resolve()
-	out_dir = Path(args.out).resolve()
-
-	build_site(repo_root=repo_root, out_dir=out_dir, site_title=args.title)
-	print(f"Wrote static site to: {out_dir}")
-
+# -----------------------------
+# Entrypoint
+# -----------------------------
 
 if __name__ == "__main__":
-	main()
+    build_writings()
