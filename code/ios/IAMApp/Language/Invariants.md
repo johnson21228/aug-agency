@@ -1,135 +1,229 @@
 # IAMApp Invariants
 
 These invariants constrain all implementation choices for the IAM iOS app.
-They must not conflict with repository-level architecture invariants.
+
+They apply regardless of:
+- runtime (foreground, background),
+- execution environment (device, optional server),
+- availability of models or network access.
 
 If code and language disagree, code is wrong.
 
 ---
 
-## I1. Append-Only Capture
+## I1. Continuity Is Primary
+
+The app exists to preserve and support a single human’s continuity over time.
+
+Continuity is defined as:
+- ordered personal language-use events,
+- preserved across time,
+- addressable for re-entry.
+
+No feature may compromise continuity preservation.
+
+---
+
+## I2. Append-Only Capture
 
 All captured LUIs are append-only.
-No LUI event is modified or deleted in place.
 
-Corrections or reinterpretations appear as new events.
+- No LUI event is modified or deleted in place.
+- Corrections, reinterpretations, or edits appear as new events.
+- History is preserved, not rewritten.
 
 ---
 
-## I2. Stable Event Identity
+## I3. Stable Event Identity
 
 Each LUI event has a stable identifier.
-Identity is not derived from semantic content.
 
-Identifiers persist across sessions, rebuilds, and upgrades.
+- Identity is not derived from semantic content.
+- Identifiers persist across:
+  - sessions,
+  - rebuilds,
+  - app upgrades,
+  - materialization runs.
 
 ---
 
-## I3. No Semantics Required for Correctness
+## I4. No Semantics Required for Correctness
 
-The app must not require embeddings, summaries, clustering, or inference to:
+The app must not require:
+- embeddings,
+- summaries,
+- clustering,
+- inference,
+- external services,
 
+to:
 - capture LUIs,
 - preserve continuity,
-- re-enter a path.
+- support re-entry.
 
 Semantic layers are optional, derived, and rebuildable.
 
 ---
 
-## I4. Conversational Surface, Continuity First
+## I5. Authoritative vs Derived Stores
+
+The following authority boundaries are strict:
+
+### Authoritative
+- `iam.db` (capture store)
+
+### Derived (Rebuildable)
+- provDB
+- subDB
+- all views, indexes, overlays, projections
+
+Derived stores may be deleted and regenerated without loss of continuity.
+
+---
+
+## I6. Conversational Surface Is a View
 
 The primary interaction surface is conversational.
 
-Conversation is a view over continuity, not the continuity itself.
-Conversation history must not become the authoritative store.
+Conversation is:
+- a view over continuity,
+- not the continuity itself.
+
+Conversation history must never become the authoritative store.
 
 ---
 
-## I5. Perspective Reversibility
+## I7. Re-entry Without Reconstruction
 
-Any perspective change (along-path, neighborhood, global) must allow
-return to a specific continuity position without reconstruction.
+The app must support re-entry into continuity without requiring:
+- summaries,
+- recomputation of meaning,
+- reinterpretation of past events.
 
-Zooming out must not erase re-entry.
-
----
-
-## I6. Local Data Residency by Default
-
-Substrate and derived stores reside locally by default.
-
-Sharing and export:
-- are explicit,
-- are user-initiated,
-- produce copies.
-
-No background upload is required for correctness.
+A user must be able to return to a position in continuity
+using structural references alone.
 
 ---
 
-## I7. Pipeline Parity with Repo Scripts
+## I8. Perspective Reversibility
 
-Processing stages implemented in IAMApp must match the stage boundaries
-and patterns established by the repo’s desktop scripts.
+All perspective changes must be reversible.
 
-If IAMApp deviates, the deviation must be written as a local decision
-record in `Language/Decisions/`.
+This includes:
+- moving along a path,
+- zooming out to neighborhoods or global views,
+- switching between views.
+
+Zooming out must not erase the ability to return.
 
 ---
 
-## I8. Multi-Source LUI Capture
+## I9. Continuity Materialization Pipeline (CMP) Parity
 
-The ingest layer must accept multiple LUI sources, including:
+Processing stages in IAMApp must follow the same stage boundaries
+defined by the Continuity Materialization Pipeline (CMP):
 
+- Stage 0: Capture (`iam.db`)
+- Stage 1: Derived views
+- Stage 2: prov materialization
+- Stage 3: sub materialization
+
+IAMApp must not collapse stages or introduce hidden dependencies.
+
+---
+
+## I10. Deterministic, Idempotent Materialization
+
+All materialization stages must be:
+- deterministic for a given input and stage version,
+- safe to rerun without corrupting upstream stores,
+- cursor- or range-based.
+
+Failures must not corrupt authoritative data.
+
+---
+
+## I11. Semantic-Free Geometry Correctness
+
+subDB correctness must not depend on semantics.
+
+Geometry is defined by:
+- ordering,
+- adjacency,
+- stitching,
+- path structure.
+
+Meaning is applied by clients, not required for geometry correctness.
+
+---
+
+## I12. Multi-Source LUI Capture
+
+The app must support multiple LUI sources, including:
 - direct text entry,
 - share sheet input,
-- clipboard capture (user-triggered),
+- user-triggered clipboard capture,
 - imported files or transcripts,
 - app-internal captures.
 
-All sources normalize into a common LUI event format without interpretation.
+All sources normalize into the same LUI event model.
 
 ---
 
-## I9. Optional One-Shot External Inference
+## I13. Optional External Inference
 
-External LLM calls, when used:
+External inference (when enabled):
 
-- are one-shot,
-- are credential-gated,
-- are not required for correctness.
+- is one-shot,
+- is credential-gated,
+- is optional,
+- must not define correctness.
 
-External inference may only enrich derived views.
-
----
-
-## I10. Photos Pattern: Authoritative Local Library
-
-The app MUST treat local storage as the authoritative library.
-
-- The app must function correctly offline for capture and re-entry.
-- Sharing and export must be explicit and user-controlled.
-- Sync must be optional and must not define correctness.
-- Export produces copies; it does not relocate authority.
+External results may enrich derived views only.
+They must never overwrite capture content.
 
 ---
 
-## I11. Authority and Workflow
+## I14. Photos Pattern: Local Library Authority
+
+IAMApp follows the Photos pattern:
+
+- the on-device library is authoritative by default,
+- sharing and export are explicit and user-initiated,
+- exports produce copies,
+- sync is optional and must not define correctness.
+
+If a server exists, it is an accelerator only.
+It must not become authoritative.
+
+---
+
+## I15. Offline Correctness
+
+The app must function correctly offline for:
+- capture,
+- continuity preservation,
+- re-entry.
+
+Network access may enhance derived views but must not be required.
+
+---
+
+## I16. Language Governs Implementation
 
 Language specifications are authoritative.
 
 - Design changes originate in `Language/`.
-- Swift code implements language-defined intent.
+- Swift code implements written intent.
 - Xcode is used for editing, debugging, previews, and deployment.
 
 Xcode is not a source of system intent.
 
 ---
 
-## I12. Small Files and Spec Traceability
+## I17. Small Files and Traceability
 
-Swift implementation must prefer small, concept-scoped files.
+Implementation must prefer small, concept-scoped Swift files.
 
 Every Swift file MUST include a governing spec reference:
 
