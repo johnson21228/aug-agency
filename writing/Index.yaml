@@ -9,6 +9,26 @@ site:
   start_section_title: Core essays
   all_section_title: All essays
 writings:
+- path: writing/essays/01_aristotle_judgment_time.md
+  title: Aristotle — Judgment as a Time-Formed Capacity
+- path: writing/essays/02_augustine_time_continuity.md
+  title: Augustine — Time as Interior Continuity and the Formation of Judgment
+- path: writing/essays/03_aquinas_prudence.md
+  title: Aquinas — Prudence as Stabilized Temporal Discernment
+- path: writing/essays/04_william_james_stream.md
+  title: William James — Judgment in the Stream of Consciousness
+- path: writing/essays/05_bergson_duration.md
+  title: Henri Bergson — Duration and the Irreversibility of Judgment
+- path: writing/essays/06_heidegger_being_in_time.md
+  title: Martin Heidegger — Being-in-Time as the Ground of Judgment
+- path: writing/essays/07_schon_reflection.md
+  title: Donald Schön — Judgment as Reflection-in-Action
+- path: writing/essays/08_polanyi_tacit.md
+  title: Michael Polanyi — Tacit Continuity and Personal Knowledge
+- path: writing/essays/09_holmes_common_law.md
+  title: Oliver Wendell Holmes Jr. — Legal Judgment as Historical Accretion
+- path: writing/essays/10_autor_judgment_econ.md
+  title: David Autor — Judgment as a Scarce, Time-Formed Resource
 - path: writing/essays/AfterWorkAfterJudgement.de-CH.md
   title: Nach dr Arbeit, nach em Urteil
 - path: writing/essays/AfterWorkAfterJudgement.es.md
@@ -30,7 +50,7 @@ writings:
 - path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.md
   title: From Task Displacement to Judgment Scarcity
 - path: writing/essays/WhyConfessionsCannotBeReplacedbyanLLM.md
-  title: Why *Confessions* Cannot Be Replaced by an LLM
+  title: Why *The Confessions of Saint Augustine* Cannot Be Replaced by an LLM
 - path: writing/essays/agency-in-an-age-of-agents.de-CH.md
   title: Agency i ere Ära vo Agente
 - path: writing/essays/agency-in-an-age-of-agents.es.md
