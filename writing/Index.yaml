@@ -1,95 +1,56 @@
-# writing/index.yaml
-# Canonical navigation + ordering for writings site build.
-# Tools/build_site.py consumes: site{}, writings[], drafts[] (optional)
-
 site:
-  title: "IAM — Writings"
-  h1: "IAM — Writings"
-  lede: >
-    A small set of essays that motivate and constrain the IAM project:
-    preserving and extending human reasoning continuity in an environment
-    increasingly shaped by automated and agentic systems.
+  title: IAM — Writings
+  h1: IAM — Writings
+  lede: 'A small set of essays that motivate and constrain the IAM project: preserving
+    and extending human reasoning continuity in an environment increasingly shaped
+    by automated and agentic systems.
 
-  start_section_title: "Core essays"
-  all_section_title: "All essays"
-
+    '
+  start_section_title: Core essays
+  all_section_title: All essays
 writings:
-  - id: W-AIAA-0001
-    path: writing/essays/agency-in-an-age-of-agents.md
-    title: "Agency in an Age of Agents"
-    status: published
-    authoritative: true
-    created: "2026-01-06"
-    start_here: true
-    notes: >
-      Frames the core problem: when execution is automated, judgment becomes
-      the scarce binding resource for agency.
-
-  - id: W-JPSV-0001
-    path: writing/essays/judgment-preserved.md
-    title: "Judgment Preserved"
-    status: published
-    authoritative: true
-    created: "2026-01-11"
-    start_here: true
-    notes: >
-      Why judgment must be preserved as a time-extended continuity artifact,
-      not treated as a one-shot evaluation performed at the end.
-
-  - id: W-MKCL-0001
-    path: writing/essays/making-cognition-legible.md
-    title: "Making Cognition Legible"
-    status: published
-    authoritative: true
-    created: "2026-01-10"
-    start_here: true
-    notes: >
-      Argues for legibility/visualization of continuity structures as a practical
-      requirement for understanding and governance of cognition over time.
-
-  - id: W-TDJS-0001
-    path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.md
-    title: "From Task Displacement to Judgment Scarcity"
-    status: published
-    authoritative: true
-    created: "2026-01-06"
-    start_here: true
-    notes: >
-      Reframes AI impact away from job loss and toward the erosion of the
-      environments that produce judgment.
-
-  - id: W-AWAJ-0001
-    path: writing/essays/AfterWorkAfterJudgement.md
-    title: "After Work, After Judgment"
-    status: published
-    authoritative: true
-    created: "2026-01-05"
-    start_here: true
-    notes: >
-      Explores what disappears when work no longer requires sustained human reflection.
-
-  - id: W-CPCOT-0001
-    path: writing/essays/continuity-privacy-conditions-of-thought.md
-    title: "Continuity, Privacy, and the Conditions of Thought"
-    status: published
-    authoritative: true
-    created: "2026-01-03"
-    start_here: true
-    notes: >
-      Claims private continuity is not a preference but a prerequisite for thinking itself.
-
-  - id: W-AAWM-0001
-    path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
-    title: "Agency at Work: Middle-Class Cognitive Infrastructure"
-    status: published
-    authoritative: true
-    created: "2026-01-04"
-
-  - id: W-CCLT-0001
-    path: writing/essays/claude-chatgpt-limits-for-thinking.md
-    title: "Claude & ChatGPT: Limits for Thinking"
-    status: published
-    authoritative: true
-    created: "2026-01-06"
-
+- path: writing/essays/AfterWorkAfterJudgement.de-CH.md
+  title: Nach dr Arbeit, nach em Urteil
+- path: writing/essays/AfterWorkAfterJudgement.es.md
+  title: Después del trabajo, después del juicio
+- path: writing/essays/AfterWorkAfterJudgement.md
+  title: After Work, After Judgment
+- path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.de-CH.md
+  title: 'Agency bi dr Arbeit: kognitivi Infrastruktur vo dr Mittelschicht'
+- path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.es.md
+  title: 'La agencia en el trabajo: la infraestructura cognitiva de la clase media'
+- path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
+  title: 'Agency at Work: Why the Middle Class Needs Cognitive Infrastructure'
+- path: writing/essays/Continuity Before Computation.md
+  title: Continuity Before Computation
+- path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.de-CH.md
+  title: Vom Aufgabenverdrängige zur Urteilsverknappig
+- path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.es.md
+  title: Del desplazamiento de tareas a la escasez de juicio
+- path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.md
+  title: From Task Displacement to Judgment Scarcity
+- path: writing/essays/WhyConfessionsCannotBeReplacedbyanLLM.md
+  title: Why *Confessions* Cannot Be Replaced by an LLM
+- path: writing/essays/agency-in-an-age-of-agents.de-CH.md
+  title: Agency i ere Ära vo Agente
+- path: writing/essays/agency-in-an-age-of-agents.es.md
+  title: La Agencia en una Era de Agentes
+- path: writing/essays/agency-in-an-age-of-agents.md
+  title: Agency in an Age of Agents
+- path: writing/essays/claude-chatgpt-limits-for-thinking.de-CH.md
+  title: D Grenze vo «Thinking Support» ohni Kontinuität
+- path: writing/essays/claude-chatgpt-limits-for-thinking.es.md
+  title: Los límites del “apoyo al pensamiento” sin continuidad
+- path: writing/essays/claude-chatgpt-limits-for-thinking.md
+  title: claude-chatgpt-limits-for-thinking
+- path: writing/essays/continuity-privacy-conditions-of-thought.de-CH.md
+  title: Kontinuität, Privatsphäre und d Bedingige vom Dänke
+- path: writing/essays/continuity-privacy-conditions-of-thought.es.md
+  title: Continuidad, privacidad y las condiciones del pensamiento
+- path: writing/essays/continuity-privacy-conditions-of-thought.md
+  title: Continuity, Privacy, and the Conditions of Thought
+- path: writing/essays/judgment-preserved.md
+  title: Judgment, Preserved
+- path: writing/essays/making-cognition-legible.md
+  title: MAKING COGNITION LEGIBLE
 drafts: []

@@ -287,3 +287,10 @@ pack-writings: venv-pdf
 
 clean:
 	@rm -rf dist docs
+
+
+.PHONY: update-writing-index
+
+update-writing-index:
+	@echo "Updating writing/index.yaml from writing/essays/"
+	python tools/update_writing_index.py
