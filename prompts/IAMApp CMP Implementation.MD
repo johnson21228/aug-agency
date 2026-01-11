@@ -101,6 +101,6 @@ Everything must be:
 
 START CONDITION
 
-Ask me for the latest pack.zip.
+Ask me for the latest augmented-agency-ingest-md-py.zip.
 
 Do not proceed until it is provided.
