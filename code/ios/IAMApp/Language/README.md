@@ -1,31 +1,62 @@
+# IAMApp — Language as Infrastructure
+
+This folder is the governing language layer for the IAM iOS app.
+
+It defines:
+- goals and non-goals,
+- invariants and constraints,
+- interface expectations,
+- feature specifications,
+- development workflow rules.
+
+This folder is authoritative for the app.
+If code and language disagree, code is wrong.
+
+---
+
 ## Relationship to Root Repository Language
 
-This `Language/` folder is a local instantiation of the repo’s “Language as Infrastructure” pattern.
-It exists to govern the IAM iOS embodiment only.
+This `Language/` folder is a local instantiation of the repository’s
+“Language as Infrastructure” pattern.
 
-### Root authority (upstream)
+### Upstream authority
 
-The following are upstream and authoritative over this app:
+The following are authoritative over this app:
 
-- `README.md` (root) — method and authority ordering
-- `writing/overview.md` and `writing/essays/` — normative claims and consequences
-- `architecture/` — system invariants and architectural constraints
-- `core-ontology/` — stable primitives and shared terminology
+- root `README.md`
+- `writing/overview.md`
+- `architecture/`
+- `architecture/legibility.md`
+- `core-ontology/`
 
-### Local authority (this folder)
+Local language must not contradict upstream premises or invariants.
 
-This folder may:
-- specialize upstream goals into iOS-scoped requirements,
-- define app-local interface contracts,
-- define feature specs and acceptance criteria,
-- constrain LLM-generated code and patches for this app.
+---
 
-This folder must NOT:
-- contradict upstream premises or invariants,
-- redefine core terms in incompatible ways,
-- treat app implementation as the source of truth.
+## Local Authority Order
 
-### Rule of precedence
+1. `Language/Goals.md`
+2. `Language/Invariants.md`
+3. `Language/Interfaces/`
+4. `Language/Specs/`
+5. Swift code (implementation)
 
-If a local spec conflicts with upstream language, the local spec is wrong.
-Update local language to conform to root, or revise upstream only if the intent of the repository has changed.
+If a lower layer conflicts with a higher layer, the lower layer is wrong.
+
+---
+
+## Workflow Rule
+
+- Language defines intent.
+- Code implements intent.
+- Xcode debugs intent.
+
+Design changes originate in language.
+Xcode is an instrument, not a source of authority.
+
+---
+
+## Platform Scaffold Note
+
+An Apple sample project may exist under a scaffold directory.
+That scaffold is non-authoritative and must conform to this language layer.
