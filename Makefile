@@ -235,3 +235,55 @@ build-subdb:
 
 .PHONY: init-all
 init-all: init-iam-db build-provdb build-prp-nodes build-subdb
+
+
+.PHONY: pack-writings pack-writings-src
+
+pack-writings:
+	@mkdir -p dist
+	@.venv/bin/python tools/pack_writings.py --out dist/pack-writings.zip --pdf
+
+pack-writings-src:
+	@mkdir -p dist
+	@.venv/bin/python tools/pack_writings.py --out dist/pack-writings-src.zip --no-pdf
+
+
+
+SHELL := /bin/bash
+
+VENV := .venv
+PYTHON := $(VENV)/bin/python
+PIP := $(VENV)/bin/pip
+
+.PHONY: help venv venv-pdf build-site pack-writings pack-writings-src clean
+
+help:
+	@echo "Targets:"
+	@echo "  make venv               - create .venv and install requirements.txt"
+	@echo "  make venv-pdf           - install PDF requirements (reportlab)"
+	@echo "  make build-site         - build docs/ from writing/index.yaml"
+	@echo "  make pack-writings-src  - zip writings (source-only, no PDFs)"
+	@echo "  make pack-writings      - zip writings + PDFs (requires venv-pdf)"
+	@echo "  make clean              - remove dist/ and docs/"
+
+venv:
+	@test -d $(VENV) || python3 -m venv $(VENV)
+	@$(PIP) install --upgrade pip
+	@$(PIP) install -r requirements.txt
+
+venv-pdf: venv
+	@$(PIP) install -r requirements-pdf.txt
+
+build-site: venv
+	@$(PYTHON) Tools/build_site.py
+
+pack-writings-src: venv
+	@mkdir -p dist
+	@$(PYTHON) Tools/pack_writings.py --out dist/pack-writings-src.zip --no-pdf
+
+pack-writings: venv-pdf
+	@mkdir -p dist
+	@$(PYTHON) Tools/pack_writings.py --out dist/pack-writings.zip --pdf
+
+clean:
+	@rm -rf dist docs

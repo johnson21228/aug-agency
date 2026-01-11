@@ -1,7 +1,6 @@
 # writing/index.yaml
-# Authoritative navigation + ordering for the writings site build.
-# build_site.py consumes: writings[], drafts[] (optional)
-# "start_here" is a curated subset used on the landing page.
+# Canonical navigation + ordering for writings site build.
+# Tools/build_site.py consumes: site{}, writings[], drafts[] (optional)
 
 site:
   title: "IAM — Writings"
@@ -11,7 +10,6 @@ site:
     preserving and extending human reasoning continuity in an environment
     increasingly shaped by automated and agentic systems.
 
-  # Rename the top section here (default would be "Start here" if omitted)
   start_section_title: "Core essays"
   all_section_title: "All essays"
 

@@ -6,93 +6,89 @@ remain consistent with.
 
 The writings are ordered by conceptual dependency, not publication date.
 
+Canonical ordering for the site (and for `pack-writings`) is defined in `writing/index.yaml`.
+
 ---
 
-## Core orientation essays
+## Core essays
 
 ### `agency-in-an-age-of-agents.md`
-**Establishes:**
+**Establishes:**  
 The central problem the project addresses: preserving human agency and judgment
 as automated and agentic systems increasingly outperform humans on isolated tasks.
 
-**Why it matters:**
+**Why it matters:**  
 Defines the asymmetry IAM is responding to and frames continuity as a human advantage,
 not an optimization problem.
 
 ---
 
-### `continuity-inference-preservation-of-thought.md`
-**Establishes:**
-Continuity as a prerequisite for judgment, meaning, and long-horizon reasoning.
+### `judgment-preserved.md`
+**Establishes:**  
+Judgment as a continuity artifact that must be preserved over time, not reconstructed
+from end-state outputs or retrospective summaries.
 
-**Why it matters:**
-Direct conceptual feeder into the Continuity Manifold and temporal polymerization
-architecture.
-
----
-
-## System-adjacent conceptual essays
-
-### `imagination-attention-meaning.md`
-**Establishes:**
-The relationship between imagination, attention, and meaning in human cognition.
-
-**Why it matters:**
-Constrains what kinds of “memory” systems are acceptable and what flattening operations
-must be avoided.
+**Why it matters:**  
+Justifies append-only capture, resistance to overwrite, and the system’s commitment
+to time-extended judgment formation.
 
 ---
 
-### `judgment-and-temporality.md` (if present)
-**Establishes:**
-Judgment as temporally situated rather than stateless or transactional.
+### `making-cognition-legible.md`
+**Establishes:**  
+Why cognition and continuity structures must be made legible (including via visualization)
+to support understanding, navigation, and governance over time.
 
-**Why it matters:**
-Justifies append-only semantics and resistance to overwrite or summary collapse.
-
----
-### `claude-chatgpt-limits-for-thinking.md`
-**Establishes:**
-Why coherence-first “thinking support” systems (LLMs framed as thinking aids)
-are structurally incapable of supporting long-horizon continuity.
-
-**Why it matters:**
-Positions IAM as a continuity-preserving substrate rather than an inference
-or reasoning optimization system, and clarifies complementarity rather than
-competition with LLMs.
-
-## Structural / economic context
-
-### `structural-divergence-capital-labor.md`
-**Establishes:**
-Macro-level pressures that make individual cognitive leverage increasingly important.
-
-**Why it matters:**
-Grounds IAM as a response to structural conditions, not a speculative AI feature set.
+**Why it matters:**  
+Constrains the system toward inspectable continuity structures rather than opaque
+“smart memory” behavior.
 
 ---
 
-## Optional / supporting essays
+### `FromTaskDisplacementtoJudgmentScarcity.md`
+**Establishes:**  
+AI impact as judgment scarcity (loss of the environments that produce judgment),
+not merely task displacement.
 
-### `agents-without-continuity.md` (if present)
-**Establishes:**
-Why artificial agents lack continuity and therefore cannot possess judgment in the
-human sense.
+**Why it matters:**  
+Grounds IAM as continuity infrastructure for judgment rather than a productivity layer.
 
-**Why it matters:**
-Clarifies boundaries between augmentation and replacement.
+---
+
+### `AfterWorkAfterJudgement.md`
+**Establishes:**  
+What disappears when work no longer requires sustained human reflection.
+
+**Why it matters:**  
+Clarifies what is being lost culturally and individually, and why continuity preservation
+matters as conditions shift.
+
+---
+
+### `continuity-privacy-conditions-of-thought.md`
+**Establishes:**  
+Private continuity as a prerequisite for thinking, meaning, and long-horizon reasoning.
+
+**Why it matters:**  
+Explains why privacy is structural (a condition of thought), not a feature preference.
+
+---
+
+## Additional essays
+
+- `Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md`
+- `claude-chatgpt-limits-for-thinking.md`
 
 ---
 
 ## Drafts
 
-### `drafts/`
-Contains exploratory or incomplete writings.
-Drafts are **not authoritative** unless explicitly promoted.
+`writing/drafts/` contains exploratory or incomplete writings. Drafts are **not authoritative**
+unless explicitly promoted.
 
 Promotion occurs by:
 - moving the file out of `drafts/`
-- adding it to this index
+- adding it to `writing/index.yaml`
 - and ensuring consistency with existing authoritative writings
 
 ---
@@ -102,9 +98,7 @@ Promotion occurs by:
 New collaborators should read, at minimum:
 
 1. `agency-in-an-age-of-agents.md`
-2. `continuity-inference-preservation-of-thought.md`
-
-All architectural and technical documents assume familiarity with the claims made
-in those essays.
+2. `judgment-preserved.md`
+3. `making-cognition-legible.md`
 
 For authority rules and non-contradiction constraints, see `MAP.md`.

@@ -1,4 +1,3 @@
-import os
 import html
 import yaml
 from pathlib import Path
@@ -11,7 +10,11 @@ ROOT = Path(__file__).resolve().parent.parent
 WRITING_DIR = ROOT / "writing"
 ESSAYS_DIR = WRITING_DIR / "essays"
 OUTPUT_DIR = ROOT / "docs"
-STYLE_PATH = "../style.css"
+
+# Essays are written to docs/writings/*.html -> need ../style.css
+STYLE_ESSAY = "../style.css"
+# Index is written to docs/index.html -> need style.css
+STYLE_INDEX = "style.css"
 
 
 # -----------------------------
@@ -89,20 +92,23 @@ def load_index():
     if not index_path.exists():
         raise FileNotFoundError("Missing writing/index.yaml")
     with open(index_path, "r", encoding="utf-8") as f:
-        return yaml.safe_load(f)
+        idx = yaml.safe_load(f)
+    if not isinstance(idx, dict):
+        raise ValueError("writing/index.yaml must parse to a mapping (dict).")
+    return idx
 
 
 # -----------------------------
-# Essay helpers
+# IO helpers
 # -----------------------------
 
-def read_essay(path):
+def read_essay(path: Path) -> str:
     if not path.exists():
         raise FileNotFoundError(f"Essay not found: {path}")
     return path.read_text(encoding="utf-8")
 
 
-def write_html(path, html_text):
+def write_html(path: Path, html_text: str) -> None:
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(html_text, encoding="utf-8")
 
@@ -115,61 +121,53 @@ def build_writings():
     idx = load_index()
 
     writings = idx.get("writings", [])
-    site_title = idx.get("site", {}).get("title", "IAM — Writings")
-
-    # -----------------------------
-    # SITE METADATA (THIS IS WHERE YOUR BLOCK GOES)
-    # -----------------------------
+    if not isinstance(writings, list):
+        raise ValueError("writing/index.yaml: 'writings' must be a list.")
 
     site_meta = idx.get("site", {}) if isinstance(idx.get("site", {}), dict) else {}
 
-    start_section_title = site_meta.get("start_section_title") or "Start here"
-    all_section_title = site_meta.get("all_section_title") or "All writings"
-
+    site_title = site_meta.get("title") or "IAM — Writings"
     h1 = site_meta.get("h1") or "IAM — Writings"
     lede = site_meta.get("lede") or (
         "A small set of essays that motivate and constrain the IAM project: preserving and extending "
         "human reasoning continuity in an environment increasingly shaped by automated and agentic systems."
     )
-
-    # -----------------------------
-    # Render essays
-    # -----------------------------
+    start_section_title = site_meta.get("start_section_title") or "Start here"
+    all_section_title = site_meta.get("all_section_title") or "All writings"
 
     start_here_items = []
     all_items = []
 
     for item in writings:
-        path = ROOT / item["path"]
-        slug = Path(item["path"]).stem
-        title = item["title"]
+        if not isinstance(item, dict) or "path" not in item or "title" not in item:
+            raise ValueError("Each writings[] item must be a mapping with at least 'path' and 'title'.")
 
-        raw_md = read_essay(path)
+        src = ROOT / item["path"]
+        slug = Path(item["path"]).stem
+        title = str(item["title"])
+
+        raw_md = read_essay(src)
         body_html = render_md(raw_md)
 
         notes_html = ""
         if item.get("notes"):
-            notes_html = f"<p><em>{html.escape(item['notes'])}</em></p>"
+            notes_html = f"<p><em>{html.escape(str(item['notes']))}</em></p>"
 
         essay_html = ESSAY_TEMPLATE.format(
             title=html.escape(title),
             notes=notes_html,
             content=body_html,
-            style=STYLE_PATH,
+            style=STYLE_ESSAY,
         )
 
-        output_path = OUTPUT_DIR / "writings" / f"{slug}.html"
-        write_html(output_path, essay_html)
+        out_path = OUTPUT_DIR / "writings" / f"{slug}.html"
+        write_html(out_path, essay_html)
 
         link_html = f"<p><a href='writings/{slug}.html'>{html.escape(title)}</a></p>"
 
         all_items.append(link_html)
         if item.get("start_here"):
             start_here_items.append(link_html)
-
-    # -----------------------------
-    # Render index page
-    # -----------------------------
 
     index_html = INDEX_TEMPLATE.format(
         title=html.escape(site_title),
@@ -179,15 +177,11 @@ def build_writings():
         all_section_title=html.escape(all_section_title),
         start_here_items="\n".join(start_here_items),
         all_items="\n".join(all_items),
-        style=STYLE_PATH,
+        style=STYLE_INDEX,
     )
 
     write_html(OUTPUT_DIR / "index.html", index_html)
 
-
-# -----------------------------
-# Entrypoint
-# -----------------------------
 
 if __name__ == "__main__":
     build_writings()

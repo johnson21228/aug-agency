@@ -56,3 +56,18 @@ data/
 # Allow placeholders
 ############################
 !.keep
+
+# Python virtualenv
+.venv/
+
+# Python caches
+__pycache__/
+*.pyc
+
+# Build / output artifacts
+dist/
+docs/
+
+# OS noise
+.DS_Store
+
