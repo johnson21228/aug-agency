@@ -1,32 +1,240 @@
+# IAM — Intelligent Augmented Memory
 
-## Language as Infrastructure
+IAM is a system for preserving **cognitive continuity over time**.
 
-This repository treats language as infrastructure: goals, constraints, and invariants are defined in natural language so that humans and language models can generate and evaluate artifacts coherently over time without reconstruction.
-# IAM Core
+It is not a note-taking system, a retrieval engine, or an agent framework.
+It is an infrastructure for capturing language-use events and deriving
+time-extended continuity structures without collapsing them into snapshots,
+graphs, or reconstructed coherence.
 
-This repository presents a coherent body of work concerned with the preservation of human reasoning continuity under conditions increasingly shaped by automated and agentic systems.
+This repository defines IAM as a **Language-Infrastructure (LI)** project.
+Its primary obligation is internal consistency, invariants, and auditability.
 
-It is not a product repository, not a startup prototype, and not an attempt to build a better AI. It exists to articulate, stabilize, and test a set of claims about judgment, agency, and continuity over time—and to make those claims legible across essays, system architecture, and concrete embodiments.
+---
 
-The materials here are intentionally ordered and internally constrained. Later sections do not supersede earlier ones; technical artifacts do not outrank conceptual foundations.
+## What This Repository Is
 
-## How to read this repository
+This repository is:
 
-1. Start with the writings to understand the motivating problem, stakes, and core claims around human agency, judgment, and continuity.
-2. Proceed to the architecture to see how those claims are operationalized as system invariants, layers, and pipelines.
-3. Consult patent materials for legal crystallization, traceability, and protection of the same ideas.
-4. Review embodiments and code only as optional reductions to practice and feasibility demonstrations.
+- An **authoritative specification** of IAM’s invariants and architecture
+- A **language-level infrastructure** that constrains tools, prompts, and code
+- A **solid-state representation** of the project that must stand on its own
 
-Code is not authoritative. Architecture does not supersede the writings.
+The repo is designed so that a technically sophisticated reader can:
 
-## Repository structure and authority
+- Understand the system without prior conversations
+- Audit its claims against its architecture
+- Extend it without violating core invariants
 
-- `writing/` — normative and conceptual foundation; upstream design constraints and explanatory essays
-- `patent/` — provisional drafts, claims, and traceability
-- `architecture/` — system invariants and technical truth layer (levels, pipelines, comparisons)
-- `embodiments/` — worked examples and reduction-to-practice artifacts
-- `core-ontology/` — primitives, invariants, and shared glossary
-- `residue/` — prompts, schemas, and samples (redacted)
-- `code/` — non-authoritative prototypes (e.g., iOS ingestion app)
+---
 
-See `MAP.md` for explicit authority boundaries and non-contradiction rules.
+## What This Repository Is Not
+
+This repository is **not**:
+
+- A marketing site
+- A product pitch
+- A model-centric AI system
+- A dashboard or visualization framework
+- A claim that judgment can be automated or reconstructed
+
+Any artifact that implies these properties is incorrect.
+
+---
+
+## Core Commitments
+
+IAM is built on the following commitments:
+
+- Cognition unfolds as a **time-extended trajectory**, not as points or states
+- Judgment is **formed through continuity**, not computed from snapshots
+- Capture is authoritative; derived artifacts are **non-authoritative**
+- Semantic meaning is optional and must never be correctness-critical
+- Continuity must remain valid even if all semantics are removed
+
+These commitments are enforced through explicit invariants and contracts.
+
+---
+
+## Authority Structure (Critical)
+
+If documents conflict, authority resolves **in this order**:
+
+1. `architecture/continuity-operating-contract.md`
+2. `architecture/invariants.md`
+3. `core-ontology/glossary.md`
+4. `core-ontology/continuity.md`
+5. Specific contracts (ProvDB, SubDB, CAP)
+6. Architecture overviews and essays
+7. Tools, scripts, prompts
+
+Anything lower must conform to anything higher.
+
+---
+
+## Authoritative Documents
+
+The following files are **normative**:
+
+- `architecture/continuity-operating-contract.md`  
+  Defines what continuity means operationally and what must never be violated.
+
+- `architecture/invariants.md`  
+  Enumerates non-negotiable system invariants.
+
+- `core-ontology/glossary.md`  
+  Canonical definitions of core terms (LUI, continuity, substrate, etc.).
+
+- `core-ontology/continuity.md`  
+  Formal description of continuity as a time-extended structure.
+
+---
+
+## Architectural Structure
+
+### Capture Layer
+
+- **LUIs (Language Use Instances)** are captured events.
+- Capture is append-only and authoritative.
+- Events may arrive in any order.
+- Corrections appear as new events, not edits.
+
+Relevant files:
+- `architecture/cmp/lui_packet.md`
+- `architecture/Migrations.md`
+- `Migrations/0001_capture_contract.sql`
+
+---
+
+### Derived Layers
+
+Derived layers are rebuildable and non-authoritative.
+
+- **ProvDB**  
+  Provenance-rich, may include semantics.
+
+- **SubDB**  
+  Numeric / structural continuity substrate.
+  Must be semantic-free for correctness.
+
+Relevant contracts:
+- `architecture/cmp/contracts/provdb_contract.md`
+- `architecture/cmp/contracts/subdb_contract.md`
+
+---
+
+### Continuity Access
+
+- **CAP (Continuity Access Protocol)** provides read access.
+- CAP must remain correct without semantic overlays.
+- Semantic views are optional and non-authoritative.
+
+Relevant files:
+- `architecture/continuity-operating-contract.md`
+- `architecture/invariants.md`
+
+---
+
+## Semantics and Meaning
+
+- Embeddings, summaries, classifications, and models are **overlays**
+- Overlays may be replaced, removed, or regenerated
+- Continuity correctness must not depend on any semantic overlay
+
+If removing all semantics breaks continuity, the system is incorrect.
+
+---
+
+## Canonical Packing and Audits
+
+To avoid oral tradition, IAM defines canonical packed representations.
+
+Authoritative definition:
+- `architecture/pack-canonical-artifacts.md`
+
+Current state:
+- `Tools/pack_md_repo.py` produces a deterministic ZIP of curated artifacts
+- This ZIP is the current canonical audit input
+
+Boot prompts and audits **must specify** which canonical pack they expect.
+
+---
+
+## Essays and Conceptual Texts
+
+Essays in this repo:
+
+- Support architectural claims
+- Clarify judgment, continuity, and agency
+- Do not define invariants or authority
+
+Essays must never contradict:
+- `architecture/continuity-operating-contract.md`
+- `architecture/invariants.md`
+
+---
+
+## Tools and Scripts
+
+Tools exist to:
+- Capture data
+- Pack repo state
+- Build derived artifacts
+- Generate site outputs
+
+Tools must conform to architecture and invariants.
+Tools do not define meaning or authority.
+
+Relevant tools:
+- `Tools/pack_md_repo.py`
+- `Tools/pack_writings.py`
+- `Tools/update_writing_index.py`
+- `Tools/build_site.py`
+
+---
+
+## How to Read This Repo (Suggested Order)
+
+1. `architecture/continuity-operating-contract.md`
+2. `architecture/invariants.md`
+3. `core-ontology/glossary.md`
+4. `core-ontology/continuity.md`
+5. `architecture/CONTINUITY_MANIFOLD.md`
+6. `architecture/continuity-manifold-model.md`
+7. CMP contracts (ProvDB, SubDB)
+8. Essays and comparison documents
+
+---
+
+## Non-Goals (Explicit)
+
+IAM does not attempt to:
+
+- Automate judgment
+- Replace human agency
+- Reconstruct cognition from outputs
+- Optimize for model interpretability
+- Provide dashboards as truth instruments
+
+Any such claims are out of scope.
+
+---
+
+## Solid-State Requirement
+
+This repository must remain:
+
+- Internally consistent
+- Auditable without conversation
+- Free of hidden assumptions
+- Governed by explicit invariants
+
+If understanding the system requires asking the author,
+the repository is incomplete.
+
+---
+
+## License / Status
+
+This repository is an active architectural and conceptual system.
+Refer to licensing files for usage constraints.

@@ -1,92 +1,110 @@
 # IAM Invariants
 
-These invariants are non-negotiable.
-If code or prompts conflict with these invariants, the invariants override.
+This document enumerates invariants that are **non-negotiable** for IAM.
+These invariants are **authoritative**.
 
-## 1) Language is infrastructure
-Language in this repo is not documentation. It is executable constraint.
+If any other document, tool, prompt, or code conflicts with these invariants:
+- These invariants win.
+- The conflicting artifact must be changed or removed.
 
-- Invariants declared in the repo override inferred intent.
-- Prompts are interpreters over the corpus, not authors of new authority.
-- Architecture text constrains code; code does not redefine architecture.
+Related authoritative documents:
+- `architecture/continuity-operating-contract.md` (COC)
+- `core-ontology/glossary.md`
+- `core-ontology/continuity.md`
 
-## 2) Append-only capture
-Capture is mandatory and append-only.
+---
 
-- Ingestion writes only append-only facts.
-- No updates or deletes of captured facts.
-- Idempotence is required for repeated ingestion.
+## Invariant 1 — Capture Is Append-Only and Authoritative
 
-## 3) Stable identity is event-level
-Stable identity is assigned at the event level.
+1.1 The capture record is append-only.
+- Events are never overwritten or deleted.
+- Corrections appear as additional events, not edits.
 
-- Durable referents for continuity, annotation, and long-horizon linkage must be event identities.
-- Derived identifiers must be traceable to capture provenance.
+1.2 Capture is the only authoritative history.
+- Derived stores are never treated as authoritative.
 
-### Clarification: Node projections are permitted
-Event identity is the only durable identity. However, the system may build
-policy-versioned, rebuildable node projections (e.g., PRPs, chunkings, sessions)
-as non-authoritative layers over events.
+---
 
-Such projections must:
-- be explicitly named/versioned (`layer_key`)
-- be deterministic and rebuildable from events
-- be lossless via ordered membership pointers to event identities
-- never be used as durable referents for annotation or long-horizon identity
+## Invariant 2 — Derived Artifacts Are Rebuildable and Non-Authoritative
 
-## 4) Derived structures are rebuildable and non-authoritative
-Derived structures (ProvDB, SubDB, overlays) must be rebuildable and replaceable.
+2.1 ProvDB and SubDB are derived from capture.
+- They may be deleted and rebuilt from capture.
 
-- Derived tables are not authoritative; they can be deleted and rebuilt.
-- Version overlays explicitly; never overwrite capture.
+2.2 If derived artifacts are removed, the system must still be able to rebuild them.
+- No correctness property may rely on persistence of derived artifacts.
 
-## 5) Semantic interpretation must never be required for correctness
-Continuity correctness must not require semantic interpretation.
+---
 
-- Embeddings, similarity, summaries, and meaning-coordinates are overlays.
-- If semantic overlays are removed, continuity geometry must still be valid.
+## Invariant 3 — Durable Referents Are Event Identities
 
-## 6) CAP never performs semantic joins inside the substrate
-CAP is read-only orchestration over derived stores.
+3.1 Durable referents must be event identities, not semantic labels.
+- Stable IDs must exist for captured events.
+- Derived IDs must trace back to capture.
 
-- Join only by stable IDs.
-- Composition is ephemeral and must not be persisted.
-- CAP must not depend on semantic joins for correctness.
+3.2 Joins must rely on stable identifiers.
+- No semantic similarity join may be required for correctness.
 
-## 7) Provenance is always preserved
-Every derived item must be traceable back to capture.
+---
 
-- Preserve provenance pointers and stable identifiers.
-- Preserve raw payloads as opaque ground truth.
+## Invariant 4 — Semantic Overlays Are Optional
 
-## 8) Determinism over cleverness
-Builders must be deterministic and traceable.
+4.1 Semantic overlays (embeddings, summaries, classifications) are overlays.
+- They may be present, absent, or replaced.
 
-- Prefer clarity and rebuildability.
-- Prefer explicit policies over implicit heuristics.
+4.2 If semantic overlays are removed:
+- Continuity geometry must remain valid.
+- SubDB correctness must remain valid.
 
-## 9) Continuity manifold and paths
+---
 
-The continuity manifold is stored in SubDB.
+## Invariant 5 — SubDB Correctness Is Semantic-Free
 
-- ProvDB defines coordinate schemas and metric definitions.
-- SubDB materializes those coordinates into a manifold.
-- Paths exist as curves or sequences within SubDB.
-- Semantic meaning interprets nodes and paths but does not define them.
+5.1 SubDB must not require semantics for correctness.
+- No semantic joins, embeddings, or inference are required to satisfy SubDB guarantees.
+- SubDB may store numeric/time/structural relations.
 
-Continuity correctness depends only on SubDB geometry
-and ProvDB definitions, not on semantic interpretation.
+---
 
-## 10) Adapters must not require user sequencing
+## Invariant 6 — CAP Correctness Must Not Depend on Semantic Joins
 
-Adapters capture facts and must not require the user to pre-sequence LUIs.
+6.1 CAP must remain correct without semantic overlays.
+- CAP may expose semantic views, but they are non-authoritative overlays.
+- CAP must define behavior when overlays are missing.
 
-- Adapters must accept LUIs in any arrival order.
-- Adapters must not invent semantic sequencing fields or require user-supplied ordering.
-- If the source provides an observed time, record it as `observed_ts`.
-- If observed time is missing, leave `observed_ts` NULL.
+---
 
-Deterministic ordering is derived downstream using capture facts:
-- per stream: `ORDER BY observed_ts NULLS LAST, observed_ts ASC, capture_id ASC`
+## Invariant 7 — Arrival Order Is Not User-Enforced
 
-This ensures continuity can be built without forcing the human to curate sequence.
+7.1 Adaptors may receive LUIs in any order.
+- Users are not required to sequence events manually.
+
+7.2 Any ordering used downstream must be derived and labeled as derived.
+- Observed timestamps must be preserved as observed.
+
+---
+
+## Canonical Definition Anchor Rule
+
+To prevent semantic drift:
+
+- Canonical definitions of core terms live in:
+  - `core-ontology/glossary.md`
+  - `core-ontology/continuity.md`
+
+Other documents may:
+- reference those definitions
+- extend with examples
+
+Other documents must not:
+- redefine core terms in conflicting ways
+
+---
+
+## Canonical Pack Artifact Rule
+
+To prevent “oral tradition” about what constitutes the repo’s packed representation:
+
+- The repo must define and maintain a canonical “packed representation” document:
+  - `architecture/pack-canonical-artifacts.md`
+
+Audits and boot prompts must refer to that canonical definition.
