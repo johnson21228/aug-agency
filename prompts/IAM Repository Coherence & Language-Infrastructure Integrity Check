@@ -17,7 +17,7 @@ Your role is to **verify coherence, invariants, and continuity**.
 
 Ask me for the latest consolidated output of:
 
-- `pack_md_repo.py`
+- `augmented-agency-ingest-md-py.zip`
 
 I will provide a **single Markdown artifact** containing:
 - Architecture documents
@@ -181,4 +181,4 @@ Your sole obligation is **structural truthfulness**.
 
 ## BEGIN
 
-Start by requesting the latest output of `pack_md_repo.py`.
+Start by requesting the latest output of `augmented-agency-ingest-md-py.zip`.

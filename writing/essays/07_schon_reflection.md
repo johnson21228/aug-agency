@@ -1,101 +1,59 @@
-# Donald Schön — Judgment as Reflection-in-Action
+# Judgment as Reflection-in-Action (Donald Schön)
 
 ## Overview
 
-Donald Schön’s work addresses judgment not as an abstract cognitive capacity but as a practical competence exercised in the midst of action. In *The Reflective Practitioner*, Schön examines how professionals—architects, engineers, clinicians, planners—actually judge under conditions of uncertainty, uniqueness, and time pressure. His central claim is that judgment is not applied after the fact, nor derived from explicit rules, but enacted *within* ongoing activity through a continuous process he calls reflection-in-action.
+Donald Schön examines how professionals judge in practice under conditions of uncertainty. In *The Reflective Practitioner*, he shows that judgment is exercised *within* action through a process he calls reflection-in-action.
 
-Schön’s contribution situates judgment squarely within time and continuity. Judgment unfolds as a dialog with the situation, shaped by prior experience and adjusted moment by moment as action proceeds.
-
----
-
-## The Limits of Technical Rationality
-
-Schön begins by criticizing what he calls *technical rationality*: the view that professional judgment consists in selecting and applying general rules or theories to particular cases. This model assumes that problems are well-defined, variables are known, and correct solutions can be deduced.
-
-In real practice, Schön argues, these conditions rarely hold. Practitioners face situations that are:
-- indeterminate,
-- unstable,
-- unique,
-- and resistant to formalization.
-
-Judgment in such contexts cannot wait for full problem definition. It must occur as the situation unfolds.
+Judgment is enacted, not applied.
 
 ---
 
-## Reflection-in-Action as Temporal Judgment
+## Limits of Technical Rationality
 
-Reflection-in-action names the process by which practitioners think while doing. It is not a pause for detached analysis. It is an ongoing adjustment of action in response to feedback from the situation itself.
+Technical rationality assumes problems are well-defined and solvable by rule application.
 
-This process is inherently temporal. The practitioner:
-- acts,
-- perceives the consequences,
-- reframes the situation,
-- and acts again.
+Schön shows that real practice involves indeterminate, unstable situations that resist formalization.
 
-Each move alters the context for the next. Judgment emerges from this continuity, not from a single evaluative act.
+Judgment must occur as situations unfold.
 
 ---
 
-## Knowing-in-Practice and Tacit Continuity
+## Reflection-in-Action
 
-Schön emphasizes that much professional judgment relies on *knowing-in-practice*: forms of understanding that are embedded in action and not fully articulable as rules. This knowing is acquired through repeated engagement over time.
+Reflection-in-action is thinking while doing. It is an ongoing adjustment of action in response to feedback.
 
-Judgment depends on this tacit continuity. The practitioner recognizes patterns, anomalies, and affordances because similar situations have been lived through before. What matters is not recall of explicit cases, but the shaping of perception itself.
-
-This makes judgment path-dependent and resistant to extraction.
+Judgment emerges from this temporal sequence, not from a single evaluative moment.
 
 ---
 
-## The Role of Surprise and Reframing
+## Knowing-in-Practice
 
-A key moment in reflection-in-action is surprise: when the situation behaves differently than expected. Surprise interrupts routine action and calls judgment into play.
+Much professional judgment relies on tacit knowing embedded in action.
 
-The practitioner responds not by consulting a rulebook, but by reframing the situation—seeing it differently—and adjusting action accordingly. This reframing is guided by past experience but occurs in real time.
+This knowing is formed through repeated engagement over time and reshapes perception itself.
 
-Judgment, here, is the capacity to reorganize understanding *within* the flow of action.
+Judgment is path-dependent.
 
 ---
 
-## Experimentation as Situated Inquiry
+## Surprise and Reframing
 
-Schön characterizes professional action as a form of experimentation. Each move tests an implicit hypothesis about the situation. The results inform subsequent moves.
+Surprise interrupts routine action and calls judgment into play.
 
-This experimentation is not formal or explicit. It is embedded in practice and unfolds temporally. Judgment consists in sensing which experiments are worth trying and how to interpret their outcomes as action continues.
-
-Such judgment cannot be reconstructed from final results alone. The sequence matters.
+The practitioner reframes the situation in real time, guided by experience rather than rules.
 
 ---
 
 ## Against Retrospective Rationalization
 
-Schön warns against confusing retrospective explanations with real judgment. After action, practitioners can often produce coherent accounts of why they did what they did. These accounts impose order on events after the fact.
+Post-hoc explanations impose coherence after the fact. They should not be confused with judgment as it occurred in action.
 
-But such reconstructions should not be mistaken for the judgment exercised in action. Actual judgment occurred under conditions of uncertainty, partial understanding, and temporal pressure.
-
-Judgment lives in the trajectory of engagement, not in its post hoc description.
-
----
-
-## Learning as Transformation of Judgment Over Time
-
-Professional learning, for Schön, is not primarily the acquisition of new rules. It is the transformation of one’s capacity to notice, frame, and respond within situations.
-
-This transformation occurs over time through repeated cycles of action and reflection. Judgment improves as continuity deepens.
-
-What is learned is not a procedure, but a way of seeing and acting that persists across situations.
-
----
-
-## Judgment as Situated Temporal Competence
-
-Schön’s account makes explicit what earlier philosophical treatments imply: judgment is a competence exercised *in time*, not a computation performed at a moment. It depends on continuity of engagement, sensitivity to unfolding context, and the ability to adjust direction without halting action.
-
-Judgment, therefore, cannot be separated from practice without loss.
+Judgment lives in trajectory, not narrative reconstruction.
 
 ---
 
 ## Structural Implication
 
-Judgment cannot be preserved by recording decisions, plans, or rationales alone. It depends on preserving the temporal sequence of engagement through which understanding is formed and revised.
+Judgment cannot be preserved by recording plans or rationales alone. It requires preserving the temporal path of engagement.
 
-Any system that captures outcomes while erasing the path of reflection-in-action preserves behavior while losing judgment.
+Capture outcomes without paths, and judgment disappears.

@@ -9,7 +9,13 @@
 #
 # ======================================================
 
-.PHONY: help ingest ingest-dry clean-data
+.PHONY: help ingest ingest-dry clean-data ingest-keep canonicalize
+.PHONY: lui-packets fm-chunks
+.PHONY: pack-md-py pack-writings pack-writings-src
+.PHONY: pack-all pack-repo update-writings build-site
+.PHONY: venv site docs dist clean
+.PHONY: update-writing-index
+.PHONY: publish-site publish-site-fast publish-site-open
 
 PYTHON := python3
 
@@ -23,15 +29,21 @@ help:
 	@echo ""
 	@echo "Common commands:"
 	@echo "  make ingest        Ingest latest ChatGPT export into iam.db"
-	@echo "  make ingest-dry    Normalize + validate export only (no DB write)\n  make canonicalize  Rebuild message_canonical view"
+	@echo "  make ingest-dry    Normalize + validate export only (no DB write)"
+	@echo "  make canonicalize  Rebuild message_canonical view"
+	@echo ""
+	@echo "Derived outputs:"
+	@echo "  make pack-md-py    Create canonical repo pack ZIP (Tools/pack_md_repo.py)"
+	@echo "  make pack-writings Create pack-writings.zip (English-only writings) + PDF"
+	@echo "  make docs          Build GitHub Pages site (./docs)"
+	@echo "  make pack-all      Run: pack repo + update writings index + build docs site"
 	@echo ""
 	@echo "Maintenance:"
 	@echo "  make clean-data    Remove all local data artifacts (DANGEROUS)"
 	@echo ""
 	@echo "Site:"
-	@echo "  make site          Build local preview site (./site, not committed)"
-	@echo "  make docs          Build GitHub Pages site (./docs, committed)"
 	@echo "  make venv          Create/refresh .venv for site builder"
+	@echo "  make site          Build local preview site (alias of docs; build output is ./docs)"
 	@echo ""
 
 # ------------------------------------------------------
@@ -47,22 +59,18 @@ ingest-dry:
 ingest-keep:
 	$(PYTHON) code/ingest/ingest_chatgpt_export.py --keep-staging
 
-.PHONY: lui-packets
+canonicalize:
+	$(PYTHON) code/db/rebuild_message_canonical.py
 
-.PHONY: lui-packets
+# ------------------------------------------------------
+# Exports
+# ------------------------------------------------------
 
 lui-packets:
 	$(PYTHON) code/export/export_lui_packets_stage1.py --db data/artifacts/iam.db --out data/artifacts/lui_packets.jsonl --mode final-human --max-chars 24000 --include-titles
 
-.PHONY: fm-chunks
 fm-chunks:
-	$(PYTHON) code/export/chunk_lui_packets_for_fm.py \
-	  --in data/artifacts/lui_packets.jsonl \
-	  --out data/artifacts/fm_chunks \
-	  --target-chars 16000 \
-	  --reserve-chars 2000 \
-	  --include-titles \
-	  --clean
+	$(PYTHON) code/export/chunk_lui_packets_for_fm.py --in data/artifacts/lui_packets.jsonl --out data/artifacts/fm_chunks --target-chars 16000 --reserve-chars 2000 --include-titles --clean
 
 # ------------------------------------------------------
 # Cleanup (local only, gitignored)
@@ -78,23 +86,22 @@ clean-data:
 	rm -rf data/inbox data/staging data/artifacts
 	@echo "Local data artifacts removed."
 
-.PHONY: pack-md-py
+# ------------------------------------------------------
+# Canonical repo pack
+# ------------------------------------------------------
 
 pack-md-py:
 	$(PYTHON) Tools/pack_md_repo.py
 
-
-# ======================================================
-# Site builder: project-local venv (so you don't need to
-# install PyYAML globally or activate anything manually)
-# ======================================================
+# ------------------------------------------------------
+# Site builder venv (project-local)
+# ------------------------------------------------------
 
 VENV        := .venv
 VENV_PYTHON := $(VENV)/bin/python
 VENV_PIP    := $(VENV)/bin/pip
-SITE_REQS   := tools/requirements.txt
+SITE_REQS   := Tools/requirements.txt
 
-.PHONY: venv
 venv: $(VENV_PYTHON)
 	@echo "OK: venv ready at $(VENV)"
 
@@ -110,18 +117,52 @@ $(VENV_PYTHON):
 		$(VENV_PIP) install pyyaml; \
 	fi
 
-
-.PHONY: site
-# Build local preview site (not committed)
+# Build local preview site (alias of docs; Tools/build_site.py writes to ./docs)
 site: $(VENV_PYTHON)
-	$(VENV_PYTHON) tools/build_site.py --out site
+	$(VENV_PYTHON) Tools/build_site.py
 
-.PHONY: site docs
-
-# Build GitHub Pages site (committed)
+# Build GitHub Pages site (committed output in ./docs)
 docs: $(VENV_PYTHON)
-	$(VENV_PYTHON) tools/build_site.py --out docs
+	$(VENV_PYTHON) Tools/build_site.py
 
+# ------------------------------------------------------
+# Writings pack (dist)
+# ------------------------------------------------------
+
+dist:
+	@mkdir -p dist
+
+pack-writings: dist venv
+	@.venv/bin/python Tools/pack_writings.py --out dist/pack-writings.zip --pdf
+
+pack-writings-src: dist venv
+	@.venv/bin/python Tools/pack_writings.py --out dist/pack-writings-src.zip --no-pdf
+
+clean:
+	@rm -rf dist docs
+
+# ------------------------------------------------------
+# Writing index updater
+# ------------------------------------------------------
+
+update-writing-index:
+	@echo "Updating writing/index.yaml from writing/essays/"
+	$(PYTHON) Tools/update_writing_index.py
+
+# ------------------------------------------------------
+# Pack-all (repo + writings index + docs site)
+# ------------------------------------------------------
+
+pack-repo:
+	$(PYTHON) Tools/pack_md_repo.py
+
+update-writings:
+	$(PYTHON) Tools/update_writing_index.py
+
+build-site: $(VENV_PYTHON)
+	$(VENV_PYTHON) Tools/build_site.py
+
+pack-all: pack-repo update-writings build-site
 
 # ------------------------------------------------------
 # Publish docs -> public site repo (sibling checkout)
@@ -134,163 +175,26 @@ docs: $(VENV_PYTHON)
 #   ../augmented-agency-site
 # ------------------------------------------------------
 
-SITE_REPO ?= ../augmented-agency-site
-SITE_BRANCH ?= main
-MSG ?= "Publish site updates"
+PUBLIC_SITE_DIR := ../augmented-agency-site
 
-.PHONY: publish-site-status sync-site commit-site push-site publish publish-site publish-site-commit
-
-publish-site-status:
-	@test -d "$(SITE_REPO)" || (echo "ERROR: SITE_REPO not found: $(SITE_REPO)"; exit 1)
-	@test -d "$(SITE_REPO)/.git" || (echo "ERROR: SITE_REPO is not a git repo (missing .git): $(SITE_REPO)"; exit 1)
-	@echo "OK: public site repo found at $(SITE_REPO)"
-
-# Sync only (NO git operations)
-sync-site: docs publish-site-status
-	rsync -av --delete --exclude .git docs/ "$(SITE_REPO)/"
-	@echo "Synced ./docs -> $(SITE_REPO)"
-
-# Commit in public repo (no-op if nothing changed)
-commit-site: sync-site
-	@cd "$(SITE_REPO)" && \
-	  git checkout "$(SITE_BRANCH)" >/dev/null 2>&1 || true && \
-	  if git status --porcelain | grep -q . ; then \
-	    git add -A && \
-	    git commit -m $(MSG) ; \
-	  else \
-	    echo "No changes to commit in site repo."; \
-	  fi
-
-# Push public repo (updates GitHub Pages)
-push-site: commit-site
-	@cd "$(SITE_REPO)" && git push origin "$(SITE_BRANCH)"
-	@echo "Published (GitHub Pages will update automatically)."
-
-# One-command publish: build -> sync -> commit -> push
-publish: push-site
+publish-site: docs
+	@if [ ! -d "$(PUBLIC_SITE_DIR)" ]; then \
+		echo "ERROR: public site repo not found at $(PUBLIC_SITE_DIR)"; \
+		exit 1; \
+	fi
+	@echo "Syncing ./docs -> $(PUBLIC_SITE_DIR)/docs ..."
+	rsync -av --delete docs/ "$(PUBLIC_SITE_DIR)/docs/"
 	@echo "Done."
 
-# Backwards-compatible target names
-publish-site: sync-site
-publish-site-commit: publish
-
-
-# -------- Paths --------
-IAM_DB := iam.db
-PROVDB := provdb_core.db
-SUBDB := subdb_nodes.db
-
-CAPTURE_SCHEMA := Migrations/0001_capture_contract.sql
-
-# -------- Init targets --------
-
-.PHONY: init-iam-db
-init-iam-db:
-	@if [ -f $(IAM_DB) ]; then \
-		echo "$(IAM_DB) already exists"; \
-	else \
-		echo "Creating $(IAM_DB)"; \
-		sqlite3 $(IAM_DB) < $(CAPTURE_SCHEMA); \
-	fi
-
-.PHONY: init-provdb
-init-provdb: init-iam-db
-	@if [ -f $(PROVDB) ]; then \
-		echo "$(PROVDB) already exists"; \
-	else \
-		echo "Creating empty $(PROVDB)"; \
-		python3 code/provDB/build_provdb_core.py --iam-db $(IAM_DB) --out $(PROVDB); \
-	fi
-
-# -------- Build targets --------
-
-.PHONY: build-provdb
-build-provdb:
-	@if [ ! -f $(IAM_DB) ]; then \
-		echo "ERROR: $(IAM_DB) missing. Run 'make init-iam-db' first."; \
+publish-site-fast: docs
+	@if [ ! -d "$(PUBLIC_SITE_DIR)" ]; then \
+		echo "ERROR: public site repo not found at $(PUBLIC_SITE_DIR)"; \
 		exit 1; \
 	fi
-	python3 code/provDB/build_provdb_core.py --iam-db $(IAM_DB) --out $(PROVDB)
+	@echo "Syncing ./docs -> $(PUBLIC_SITE_DIR)/docs (fast) ..."
+	rsync -a docs/ "$(PUBLIC_SITE_DIR)/docs/"
+	@echo "Done."
 
-.PHONY: build-prp-nodes
-build-prp-nodes:
-	@if [ ! -f $(PROVDB) ]; then \
-		echo "ERROR: $(PROVDB) missing. Run 'make build-provdb' first."; \
-		exit 1; \
-	fi
-	python3 code/provDB/build_provdb_nodes_prp_v1.py --provdb $(PROVDB)
-
-.PHONY: build-subdb
-build-subdb:
-	@if [ ! -f $(PROVDB) ]; then \
-		echo "ERROR: $(PROVDB) missing. Run 'make build-provdb' first."; \
-		exit 1; \
-	fi
-	python3 code/subDB/build_subdb_nodes.py \
-		--provdb $(PROVDB) \
-		--layer prp_v1_turn_pairing \
-		--out $(SUBDB)
-
-# -------- One-shot --------
-
-.PHONY: init-all
-init-all: init-iam-db build-provdb build-prp-nodes build-subdb
-
-
-.PHONY: pack-writings pack-writings-src
-
-pack-writings:
-	@mkdir -p dist
-	@.venv/bin/python tools/pack_writings.py --out dist/pack-writings.zip --pdf
-
-pack-writings-src:
-	@mkdir -p dist
-	@.venv/bin/python tools/pack_writings.py --out dist/pack-writings-src.zip --no-pdf
-
-
-
-SHELL := /bin/bash
-
-VENV := .venv
-PYTHON := $(VENV)/bin/python
-PIP := $(VENV)/bin/pip
-
-.PHONY: help venv venv-pdf build-site pack-writings pack-writings-src clean
-
-help:
-	@echo "Targets:"
-	@echo "  make venv               - create .venv and install requirements.txt"
-	@echo "  make venv-pdf           - install PDF requirements (reportlab)"
-	@echo "  make build-site         - build docs/ from writing/index.yaml"
-	@echo "  make pack-writings-src  - zip writings (source-only, no PDFs)"
-	@echo "  make pack-writings      - zip writings + PDFs (requires venv-pdf)"
-	@echo "  make clean              - remove dist/ and docs/"
-
-venv:
-	@test -d $(VENV) || python3 -m venv $(VENV)
-	@$(PIP) install --upgrade pip
-	@$(PIP) install -r requirements.txt
-
-venv-pdf: venv
-	@$(PIP) install -r requirements-pdf.txt
-
-build-site: venv
-	@$(PYTHON) Tools/build_site.py
-
-pack-writings-src: venv
-	@mkdir -p dist
-	@$(PYTHON) Tools/pack_writings.py --out dist/pack-writings-src.zip --no-pdf
-
-pack-writings: venv-pdf
-	@mkdir -p dist
-	@$(PYTHON) Tools/pack_writings.py --out dist/pack-writings.zip --pdf
-
-clean:
-	@rm -rf dist docs
-
-
-.PHONY: update-writing-index
-
-update-writing-index:
-	@echo "Updating writing/index.yaml from writing/essays/"
-	python tools/update_writing_index.py
+publish-site-open: publish-site
+	@echo "Opening public site repo ..."
+	cd "$(PUBLIC_SITE_DIR)" && git status
