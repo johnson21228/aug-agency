@@ -1,104 +1,82 @@
-# Writings — One-Page Index
+# Structural Index of Writings
 
-This index provides a concise map of the authoritative writings in this repository.
-Each essay establishes claims that downstream architecture, patents, and code must
-remain consistent with.
+The essays in this repository are not organized by topic, audience, or chronology.
 
-The writings are ordered by conceptual dependency, not publication date.
+They are grouped by the **structural constraints** they surface concerning human judgment, continuity, and responsibility under conditions of abundant artificial intelligence.
 
-Canonical ordering for the site (and for `pack-writings`) is defined in `writing/index.yaml`.
+Each essay can be read independently. Together, they describe a landscape rather than a position.
 
 ---
 
-## Core essays
+## Continuity & Time
 
-### `agency-in-an-age-of-agents.md`
-**Establishes:**  
-The central problem the project addresses: preserving human agency and judgment
-as automated and agentic systems increasingly outperform humans on isolated tasks.
+Essays in this group examine what breaks when reasoning is treated as a sequence of snapshots rather than a path through time.
 
-**Why it matters:**  
-Defines the asymmetry IAM is responding to and frames continuity as a human advantage,
-not an optimization problem.
-
----
-
-### `judgment-preserved.md`
-**Establishes:**  
-Judgment as a continuity artifact that must be preserved over time, not reconstructed
-from end-state outputs or retrospective summaries.
-
-**Why it matters:**  
-Justifies append-only capture, resistance to overwrite, and the system’s commitment
-to time-extended judgment formation.
+Key concerns include:
+- continuity
+- memory
+- return
+- irreversibility
+- path dependence
+- judgment shaped by duration
 
 ---
 
-### `making-cognition-legible.md`
-**Establishes:**  
-Why cognition and continuity structures must be made legible (including via visualization)
-to support understanding, navigation, and governance over time.
+## Judgment & Irreversibility
 
-**Why it matters:**  
-Constrains the system toward inspectable continuity structures rather than opaque
-“smart memory” behavior.
+These essays focus on decision-making that cannot be reduced to output selection or confidence scoring.
 
----
-
-### `FromTaskDisplacementtoJudgmentScarcity.md`
-**Establishes:**  
-AI impact as judgment scarcity (loss of the environments that produce judgment),
-not merely task displacement.
-
-**Why it matters:**  
-Grounds IAM as continuity infrastructure for judgment rather than a productivity layer.
+Key concerns include:
+- judgment vs inference
+- interpretation
+- error costs
+- revision without erasure
+- decisions whose consequences arrive later
 
 ---
 
-### `AfterWorkAfterJudgement.md`
-**Establishes:**  
-What disappears when work no longer requires sustained human reflection.
+## Responsibility & Accountability
 
-**Why it matters:**  
-Clarifies what is being lost culturally and individually, and why continuity preservation
-matters as conditions shift.
+These essays surface work that remains non-delegable because someone must live with the outcome across time.
 
----
-
-### `continuity-privacy-conditions-of-thought.md`
-**Establishes:**  
-Private continuity as a prerequisite for thinking, meaning, and long-horizon reasoning.
-
-**Why it matters:**  
-Explains why privacy is structural (a condition of thought), not a feature preference.
+Key concerns include:
+- guidance
+- stewardship
+- advisory roles
+- ownership of consequence
+- “judgment that sticks”
 
 ---
 
-## Additional essays
+## Delegation & Its Limits
 
-- `Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md`
-- `claude-chatgpt-limits-for-thinking.md`
+These essays examine what cannot be outsourced—even when it can be simulated—without loss of responsibility.
+
+Key concerns include:
+- agents and automation
+- advisory systems
+- substitution vs support
+- diffusion of accountability
+- human roles under scale
 
 ---
 
-## Drafts
+## Infrastructure for Human Agency
 
-`writing/drafts/` contains exploratory or incomplete writings. Drafts are **not authoritative**
-unless explicitly promoted.
+These essays connect structural constraints to the need for infrastructure that preserves continuity and responsibility.
 
-Promotion occurs by:
-- moving the file out of `drafts/`
-- adding it to `writing/index.yaml`
-- and ensuring consistency with existing authoritative writings
+Key concerns include:
+- language as infrastructure
+- invariants
+- system boundaries
+- architectural framing
+- IAM-adjacent reasoning
 
 ---
 
 ## Reading guidance
 
-New collaborators should read, at minimum:
+The categories above are not exclusive.  
+Some essays appear relevant to more than one section.
 
-1. `agency-in-an-age-of-agents.md`
-2. `judgment-preserved.md`
-3. `making-cognition-legible.md`
-
-For authority rules and non-contradiction constraints, see `MAP.md`.
+Repetition across essays is intentional and reflects invariant pressure rather than redundancy.
