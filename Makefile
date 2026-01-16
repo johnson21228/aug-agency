@@ -117,14 +117,25 @@ $(VENV_PYTHON):
 		$(VENV_PIP) install pyyaml; \
 	fi
 
+# ------------------------------------------------------
+# Site LI -> Derived (executable manifest)
+# ------------------------------------------------------
+
+.PHONY: compile-site-li bundles
+
+compile-site-li: $(VENV_PYTHON)
+	$(VENV_PYTHON) Tools/compile_site_manifest.py
+
+# Build PDF bundles + ZIPs for each section in Derived/site/site_manifest.json
+bundles: compile-site-li
+	$(VENV_PYTHON) Tools/build_site_bundles.py
+
 # Build local preview site (alias of docs; Tools/build_site.py writes to ./docs)
-site: $(VENV_PYTHON)
+site: compile-site-li
 	$(VENV_PYTHON) Tools/build_site.py
-
 # Build GitHub Pages site (committed output in ./docs)
-docs: $(VENV_PYTHON)
+docs: compile-site-li
 	$(VENV_PYTHON) Tools/build_site.py
-
 # ------------------------------------------------------
 # Writings pack (dist)
 # ------------------------------------------------------

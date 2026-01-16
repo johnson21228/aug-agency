@@ -160,23 +160,30 @@ def build_link_map(
 # Rendering
 # -------------------------------------------------
 
+
+
 def render_sections(manifest: Dict[str, Any], link_map: Dict[str, Dict[str, str]]) -> str:
     out: List[str] = []
 
+    downloads_dir = OUTPUT_DIR / "downloads"
+
     for section in manifest.get("sections", []):
+        key = section.get("key")
         label = section.get("label")
         purpose = (section.get("purpose") or "").strip()
         items = section.get("items", [])
 
-        if not label or not items:
+        if not key or not label or not items:
             continue
 
         out.append("<section>")
         out.append(f"<h2>{html.escape(label)}</h2>")
+
         if purpose:
             out.append(f"<p><em>{html.escape(purpose)}</em></p>")
-        out.append("<ol>")
 
+        # Reading list
+        out.append("<ol>")
         for item in items:
             path = item.get("path")
             title = item.get("title") or ""
@@ -186,13 +193,23 @@ def render_sections(manifest: Dict[str, Any], link_map: Dict[str, Dict[str, str]
             out.append(
                 f"<li><a href='{html.escape(href)}'>{html.escape(title)}</a></li>"
             )
-
         out.append("</ol>")
+
+        # Optional PDF bundle link (placed AFTER list)
+        zip_name = f"{key}.zip"
+        zip_path = downloads_dir / zip_name
+        if zip_path.exists():
+            out.append(
+                "<p class='download'>"
+                f"<a href='./downloads/{html.escape(zip_name)}'>"
+                "Download PDFs (ZIP)"
+                "</a></p>"
+            )
+
         out.append("</section>")
 
     return "\n".join(out)
-
-
+    
 def render_all_writings(essays, link_map) -> str:
     out = ["<ul>"]
     for _, rel, title in sorted(essays, key=lambda x: x[2].lower()):
