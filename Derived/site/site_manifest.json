@@ -6,7 +6,8 @@
     "audiences": {
       "general": "Readers seeking orientation to continuity, judgment, and responsibility.",
       "builders": "System builders, researchers, and educators concerned with legibility and invariants.",
-      "foundations": "Readers seeking philosophical foundations for time, judgment, and human agency."
+      "foundations": "Readers seeking philosophical foundations for time, judgment, and human agency.",
+      "agency": "Readers concerned with how human agency erodes under delegation, automation, and optimization."
     }
   },
   "sections": [
@@ -107,6 +108,38 @@
         {
           "path": "writing/essays/08_polanyi_tacit.md",
           "title": "Tacit Continuity and Personal Knowledge (Michael Polanyi)"
+        }
+      ]
+    },
+    {
+      "key": "agency_under_pressure",
+      "label": "Human Agency Under Pressure",
+      "audience": "agency",
+      "purpose": "Essays addressing the erosion of human agency not as sudden displacement, but as a gradual loss of judgment, responsibility, and interpretive authority under delegation and automation.",
+      "items": [
+        {
+          "path": "writing/essays/judgment-preserved.md",
+          "title": "Judgment, Preserved"
+        },
+        {
+          "path": "writing/essays/AfterWorkAfterJudgement.md",
+          "title": "After Work, After Judgment"
+        },
+        {
+          "path": "writing/essays/FromTaskDisplacementtoJudgmentScarcity.md",
+          "title": "From Task Displacement to Judgment Scarcity"
+        },
+        {
+          "path": "writing/essays/agency-in-an-age-of-agents.md",
+          "title": "Agency in an Age of Agents"
+        },
+        {
+          "path": "writing/essays/the-kind-of-work-that-still-matters.md",
+          "title": "The Kind of Work That Still Matters"
+        },
+        {
+          "path": "writing/essays/interpretation-is-the-work-that-sticks.md",
+          "title": "Interpretation Is the Work That Sticks"
         }
       ]
     }
