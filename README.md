@@ -14,6 +14,15 @@ Its primary obligation is internal consistency, invariants, and auditability.
 
 ## What This Repository Is
 
+This Language Infrastructure **cannot be compiled away**.  
+It exists precisely because **humans reason in time**.
+
+For that reason, the repository intentionally includes **human-facing,
+interpretive artifacts** alongside **machine-facing contracts and invariants**.
+Both are required to preserve continuity, judgment, and auditability across
+time. Any system that attempts to reduce this infrastructure to executable
+code alone will necessarily lose essential structure.
+
 This repository is:
 
 - An **authoritative specification** of IAM’s invariants and architecture

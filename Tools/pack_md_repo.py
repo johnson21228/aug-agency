@@ -23,7 +23,7 @@ import zipfile
 from datetime import datetime
 
 EXCLUDED_TOP_LEVEL_DIRS = {"data"}
-ALLOWED_EXTS =  {".md", ".py", ".sql",".json"}
+ALLOWED_EXTS =  {".md", ".py", ".sql",".json", ".yaml"}
 
 
 def git(cmd):

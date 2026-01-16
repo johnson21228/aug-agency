@@ -58,6 +58,7 @@ INDEX_TEMPLATE = """<!DOCTYPE html>
 <h2>{start_section_title}</h2>
 {start_here_items}
 
+{builders_section_html}
 <h2>{all_section_title}</h2>
 {all_items}
 
@@ -133,10 +134,16 @@ def build_writings():
         "human reasoning continuity in an environment increasingly shaped by automated and agentic systems."
     )
     start_section_title = site_meta.get("start_section_title") or "Start here"
+    builders_section_title = site_meta.get("builders_section_title") or "Start here — builders"
     all_section_title = site_meta.get("all_section_title") or "All writings"
 
+    start_here_list = site_meta.get("start_here")
+    builders_list = site_meta.get("start_here_builders")
+
     start_here_items = []
+    builders_items = []
     all_items = []
+    link_by_path = {}
 
     for item in writings:
         if not isinstance(item, dict) or "path" not in item or "title" not in item:
@@ -166,8 +173,41 @@ def build_writings():
         link_html = f"<p><a href='writings/{slug}.html'>{html.escape(title)}</a></p>"
 
         all_items.append(link_html)
-        if item.get("start_here"):
-            start_here_items.append(link_html)
+        link_by_path[str(item["path"])] = link_html
+
+
+    # Build Start Here section
+    if isinstance(start_here_list, list):
+        for ref in start_here_list:
+            if isinstance(ref, dict) and "path" in ref:
+                p = str(ref["path"])
+                if p in link_by_path:
+                    start_here_items.append(link_by_path[p])
+            elif isinstance(ref, str) and ref in link_by_path:
+                start_here_items.append(link_by_path[ref])
+    else:
+        # Backward compatible: use writings[].start_here flag
+        for item in writings:
+            if isinstance(item, dict) and item.get("start_here"):
+                p = str(item["path"])
+                if p in link_by_path:
+                    start_here_items.append(link_by_path[p])
+
+    # Build Builders Start Here section
+    if isinstance(builders_list, list):
+        for ref in builders_list:
+            if isinstance(ref, dict) and "path" in ref:
+                p = str(ref["path"])
+                if p in link_by_path:
+                    builders_items.append(link_by_path[p])
+            elif isinstance(ref, str) and ref in link_by_path:
+                builders_items.append(link_by_path[ref])
+
+    builders_section_html = ""
+    if builders_items:
+        builders_section_html = (
+            f"<h2>{html.escape(builders_section_title)}</h2>\n" + "\n".join(builders_items) + "\n"
+        )
 
     index_html = INDEX_TEMPLATE.format(
         title=html.escape(site_title),
@@ -176,6 +216,7 @@ def build_writings():
         start_section_title=html.escape(start_section_title),
         all_section_title=html.escape(all_section_title),
         start_here_items="\n".join(start_here_items),
+        builders_section_html=builders_section_html,
         all_items="\n".join(all_items),
         style=STYLE_INDEX,
     )

@@ -35,6 +35,48 @@ site:
       href: foundations.html
 
 
+
+  # ------------------------------------------------------------
+  # START HERE (General)
+  # ------------------------------------------------------------
+  # A deliberate reading path for first-time readers.
+  # Not recency-based and not exhaustive.
+
+  start_section_title: Start here
+  start_here:
+    - path: writing/essays/continuity-privacy-conditions-of-thought.md
+      title: Continuity, Privacy, and the Conditions of Thought
+    - path: writing/essays/judgment-preserved.md
+      title: Judgment, Preserved
+    - path: writing/essays/making-cognition-legible.md
+      title: Making Cognition Legible
+    - path: writing/essays/agency-in-an-age-of-agents.md
+      title: Agency in an Age of Agents
+    - path: writing/essays/claude-chatgpt-limits-for-thinking.md
+      title: Limits of “Thinking Support” Without Continuity
+    - path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
+      title: "Agency at Work: Why the Middle Class Needs Cognitive Infrastructure"
+
+  # ------------------------------------------------------------
+  # START HERE (Builders)
+  # ------------------------------------------------------------
+  # A reading path for technically-oriented readers.
+
+  builders_section_title: Start here — builders
+  start_here_builders:
+    - path: writing/essays/making-cognition-legible.md
+      title: Making Cognition Legible
+    - path: writing/essays/claude-chatgpt-limits-for-thinking.md
+      title: Limits of “Thinking Support” Without Continuity
+    - path: writing/essays/continuity-privacy-conditions-of-thought.md
+      title: Continuity, Privacy, and the Conditions of Thought
+    - path: writing/essays/FromTaskDisplacementtoJudgmentScarcity.md
+      title: From Task Displacement to Judgment Scarcity
+    - path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
+      title: "Agency at Work: Why the Middle Class Needs Cognitive Infrastructure"
+    - path: writing/essays/agency-in-an-age-of-agents.md
+      title: Agency in an Age of Agents
+
 writings:
 
   # --- Continuity & Time ---
@@ -130,7 +172,7 @@ writings:
   # --- Infrastructure for Human Agency ---
 
   - path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.md
-    title: Agency at Work: Why the Middle Class Needs Cognitive Infrastructure
+    title: "Agency at Work: Why the Middle Class Needs Cognitive Infrastructure"
 
   - path: writing/essays/Agency_at_Work_Middle_Class_Cognitive_Infrastructure.de-CH.md
     title: Agency bi dr Arbeit: kognitivi Infrastruktur vo dr Mittelschicht
