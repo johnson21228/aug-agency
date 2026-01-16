@@ -9,6 +9,7 @@ site:
   audiences:
     general: Readers seeking orientation to continuity, judgment, and responsibility.
     builders: System builders, researchers, and educators concerned with legibility and invariants.
+    foundations: Readers seeking philosophical foundations for time, judgment, and human agency.
 
 reading_paths:
   start_here:
@@ -50,3 +51,26 @@ reading_paths:
         title: From Task Displacement to Judgment Scarcity
       - path: writing/essays/continuity-is-not-shared.md
         title: Continuity Is Not Shared
+
+  foundations:
+    label: Foundations: Time, Judgment, and Human Agency
+    audience: foundations
+    purpose: >
+      Philosophical and intellectual foundations for the claims made elsewhere in
+      this repository. These essays situate continuity, judgment, and responsibility
+      within durable traditions rather than contemporary tooling debates.
+    items:
+      - path: writing/essays/01_aristotle_judgment_time.md
+        title: Judgment as a Time-Formed Capacity (Aristotle)
+      - path: writing/essays/02_augustine_time_continuity.md
+        title: Time as Interior Continuity and the Formation of Judgment (Augustine)
+      - path: writing/essays/03_aquinas_prudence.md
+        title: Prudence as Stabilized Temporal Discernment (Aquinas)
+      - path: writing/essays/04_william_james_stream.md
+        title: Judgment in the Stream of Consciousness (William James)
+      - path: writing/essays/05_bergson_duration.md
+        title: Duration and the Irreversibility of Judgment (Henri Bergson)
+      - path: writing/essays/06_heidegger_being_in_time.md
+        title: Being-in-Time as the Ground of Judgment (Martin Heidegger)
+      - path: writing/essays/08_polanyi_tacit.md
+        title: Tacit Continuity and Personal Knowledge (Michael Polanyi)

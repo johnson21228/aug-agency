@@ -5,7 +5,8 @@
     "lede": "Essays examining the structural conditions under which human judgment, continuity, and responsibility remain possible in environments increasingly shaped by automated and agentic systems.\n",
     "audiences": {
       "general": "Readers seeking orientation to continuity, judgment, and responsibility.",
-      "builders": "System builders, researchers, and educators concerned with legibility and invariants."
+      "builders": "System builders, researchers, and educators concerned with legibility and invariants.",
+      "foundations": "Readers seeking philosophical foundations for time, judgment, and human agency."
     }
   },
   "sections": [
@@ -13,7 +14,7 @@
       "key": "start_here",
       "label": "Start here",
       "audience": "general",
-      "purpose": "Orientation to why continuity and judgment matter before systems, optimization, or tool selection.\n",
+      "purpose": "Orientation to why continuity and judgment matter before systems, optimization, or tool selection.",
       "items": [
         {
           "path": "writing/essays/making-cognition-legible.md",
@@ -45,7 +46,7 @@
       "key": "start_here_builders",
       "label": "Start here — builders",
       "audience": "builders",
-      "purpose": "Structural invariants and failure modes for systems that claim to support thinking without preserving human continuity.\n",
+      "purpose": "Structural invariants and failure modes for systems that claim to support thinking without preserving human continuity.",
       "items": [
         {
           "path": "writing/essays/making-cognition-legible.md",
@@ -70,6 +71,42 @@
         {
           "path": "writing/essays/continuity-is-not-shared.md",
           "title": "Continuity Is Not Shared"
+        }
+      ]
+    },
+    {
+      "key": "foundations",
+      "label": "Foundations: Time, Judgment, and Human Agency",
+      "audience": "foundations",
+      "purpose": "Philosophical and intellectual foundations for the claims made elsewhere in this repository.",
+      "items": [
+        {
+          "path": "writing/essays/01_aristotle_judgment_time.md",
+          "title": "Judgment as a Time-Formed Capacity (Aristotle)"
+        },
+        {
+          "path": "writing/essays/02_augustine_time_continuity.md",
+          "title": "Time as Interior Continuity and the Formation of Judgment (Augustine)"
+        },
+        {
+          "path": "writing/essays/03_aquinas_prudence.md",
+          "title": "Prudence as Stabilized Temporal Discernment (Aquinas)"
+        },
+        {
+          "path": "writing/essays/04_william_james_stream.md",
+          "title": "Judgment in the Stream of Consciousness (William James)"
+        },
+        {
+          "path": "writing/essays/05_bergson_duration.md",
+          "title": "Duration and the Irreversibility of Judgment (Henri Bergson)"
+        },
+        {
+          "path": "writing/essays/06_heidegger_being_in_time.md",
+          "title": "Being-in-Time as the Ground of Judgment (Martin Heidegger)"
+        },
+        {
+          "path": "writing/essays/08_polanyi_tacit.md",
+          "title": "Tacit Continuity and Personal Knowledge (Michael Polanyi)"
         }
       ]
     }
