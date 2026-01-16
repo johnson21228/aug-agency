@@ -18,6 +18,8 @@ reading_paths:
       Orientation to why continuity and judgment matter before systems,
       optimization, or tool selection.
     items:
+      - path: writing/essays/making-cognition-legible.md
+        title: Making Cognition Legible
       - path: writing/essays/continuity-privacy-conditions-of-thought.md
         title: Continuity, Privacy, and the Conditions of Thought
       - path: writing/essays/judgment-preserved.md
@@ -28,8 +30,6 @@ reading_paths:
         title: Limits of “Thinking Support” Without Continuity
       - path: writing/essays/AfterWorkAfterJudgement.md
         title: After Work, After Judgment
-      - path: writing/essays/making-cognition-legible.md
-        title: Making Cognition Legible
 
   start_here_builders:
     label: Start here — builders
