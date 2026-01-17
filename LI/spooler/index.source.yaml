@@ -1,5 +1,3 @@
-# LI/spooler/index.source.yaml
-
 version: 0.2
 scope: LI.spooler
 description: >
@@ -7,36 +5,36 @@ description: >
   boundary (REST intake -> durable queue -> push to ingest server).
 sources:
   - path: LI/spooler/README.md
-	role: scope
-	authority: canonical
-	notes: Defines spooler boundary and purpose.
+    role: scope
+    authority: canonical
+    notes: Defines spooler boundary and purpose.
 
   - path: LI/spooler/SpoolerOutboxContract.md
-	role: contract
-	authority: canonical
-	notes: Normative spooler contract including resource envelope and failure semantics.
+    role: contract
+    authority: canonical
+    notes: Normative spooler contract including resource envelope and failure semantics.
 
   - path: LI/spooler/invariants.md
-	role: invariants
-	authority: canonical
-	notes: Durable outbox invariants and minimal executable test surface.
+    role: invariants
+    authority: canonical
+    notes: Durable outbox invariants and minimal executable test surface.
 
   - path: services/spooler_v0/README.md
-	role: implementation_notes
-	authority: supporting
-	notes: Non-authoritative service notes.
+    role: implementation_notes
+    authority: supporting
+    notes: Non-authoritative service notes.
 
   - path: services/spooler_v0/app.py
-	role: implementation
-	authority: supporting
-	notes: Reference v0 spooler service (FastAPI).
+    role: implementation
+    authority: supporting
+    notes: Reference v0 spooler service.
 
   - path: services/spooler_v0/outbox.py
-	role: implementation
-	authority: supporting
-	notes: Durable outbox storage.
+    role: implementation
+    authority: supporting
+    notes: Durable outbox storage.
 
   - path: services/spooler_v0/tests/test_spooler_v0.py
-	role: tests
-	authority: supporting
-	notes: Executable conformance checks for spooler invariants.
+    role: tests
+    authority: supporting
+    notes: Executable conformance checks for spooler invariants.
