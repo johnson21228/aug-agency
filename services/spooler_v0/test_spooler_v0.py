@@ -87,8 +87,8 @@ def test_idempotent_enqueue_no_duplicate(client_tmpdb):
 
 def test_conflicting_replay_returns_409(client_tmpdb):
 	"""
-	LI requirement: conflicting replay returns 409 and does not mutate stored envelope.
-	Note: implementation may mark status='conflict', so queued_count may drop.
+	Contract: conflicting replay returns 409 and does not mutate stored envelope.
+	The row may be marked status='conflict' and removed from the queued set.
 	"""
 	client, db_path = client_tmpdb
 
@@ -98,13 +98,12 @@ def test_conflicting_replay_returns_409(client_tmpdb):
 	r1 = client.post("/v1/spool", json=orig)
 	assert r1.status_code == 200
 
-	# Conflicting replay (same client_lui_id, different content)
 	r2 = client.post("/v1/spool", json=_lui(3, text="B"))
 	assert r2.status_code == 409
 
 	row = _fetch_row(db_path, "test:3")
-	assert row is not None, "Outbox row must remain present after conflict replay"
-	assert str(row["envelope_json"]) == orig_json, "Stored envelope must be immutable after enqueue"
+	assert row is not None
+	assert str(row["envelope_json"]) == orig_json
 
 
 def test_drain_success_acks_and_removes(client_tmpdb, monkeypatch):
@@ -172,3 +171,25 @@ def test_capacity_limit_rejects_with_507(client_tmpdb, monkeypatch):
 	r2 = client.post("/v1/spool", json=_lui(31))
 	assert r2.status_code == 507
 	assert queued_count(db_path) == 1
+
+
+def test_spool_requires_client_lui_id_returns_400(client_tmpdb):
+	"""
+	Contract (4a): /v1/spool MUST reject JSON bodies missing client_lui_id (HTTP 400)
+	and MUST NOT enqueue anything.
+	"""
+	client, db_path = client_tmpdb
+
+	before = queued_count(db_path)
+
+	payload = {
+		"captured_at": "2026-01-12T19:22:11Z",
+		"source": {"client": "test", "device_id": "DEV"},
+		"kind": "message",
+		"payload": {"text": "hello"},
+		"privacy": {"payload_mode": "plaintext"},
+	}
+
+	r = client.post("/v1/spool", json=payload)
+	assert r.status_code == 400
+	assert queued_count(db_path) == before
