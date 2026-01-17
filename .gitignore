@@ -71,3 +71,4 @@ docs/
 # OS noise
 .DS_Store
 
+spooler_outbox.db
