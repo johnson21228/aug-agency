@@ -1,4 +1,4 @@
-# services/spooler_v0/tests/test_spooler_v0.py
+# services/spooler_v0/test_spooler_v0.py
 
 from __future__ import annotations
 
@@ -7,13 +7,21 @@ from pathlib import Path
 import pytest
 from fastapi.testclient import TestClient
 
-from services.spooler_v0.app import app
+import services.spooler_v0.app as app_mod
+import services.spooler_v0.drain as drain_mod
 from services.spooler_v0.config import load_config
 from services.spooler_v0.outbox import init_outbox, queued_count
 
 
 @pytest.fixture()
 def client_tmpdb(monkeypatch, tmp_path: Path):
+    """
+    Deterministic fixture:
+    - sets env
+    - loads cfg from env
+    - forces app module to use this cfg (app.py loads cfg at import-time otherwise)
+    - initializes outbox db at the temp location
+    """
     db_path = tmp_path / "outbox.db"
     monkeypatch.setenv("OUTBOX_DB_PATH", str(db_path))
     monkeypatch.setenv("INGEST_URL", "http://example.invalid/v1/luis")
@@ -25,9 +33,12 @@ def client_tmpdb(monkeypatch, tmp_path: Path):
     monkeypatch.setenv("DRAIN_TIMEOUT_SECONDS", "2")
 
     cfg = load_config()
+
+    # Force the running app to use the fixture config (app.py loads cfg at import time).
+    app_mod.cfg = cfg
     init_outbox(cfg.outbox_db_path)
 
-    with TestClient(app) as client:
+    with TestClient(app_mod.app) as client:
         yield client, cfg.outbox_db_path
 
 
@@ -68,3 +79,68 @@ def test_conflicting_replay_returns_409(client_tmpdb):
     r2 = client.post("/v1/spool", json=_lui(3, text="B"))
     assert r2.status_code == 409
     assert queued_count(db_path) == c1
+
+
+def test_drain_success_acks_and_removes(client_tmpdb, monkeypatch):
+    """
+    Invariant: drain success removes items (acked items no longer queued).
+    """
+    client, db_path = client_tmpdb
+    client.post("/v1/spool", json=_lui(10))
+    client.post("/v1/spool", json=_lui(11))
+    assert queued_count(db_path) == 2
+
+    def fake_post(_ingest_url: str, _envelope_json: str, _timeout_seconds: int):
+        return 200, "ok"
+
+    monkeypatch.setattr(drain_mod, "_post", fake_post)
+
+    r = client.post("/v1/drain")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["acked"] == 2
+    assert body["failed"] == 0
+    assert body["conflicts"] == 0
+    assert queued_count(db_path) == 0
+
+
+def test_drain_failure_leaves_items_queued(client_tmpdb, monkeypatch):
+    """
+    Invariant: drain failure leaves items intact (not acked/removed).
+    """
+    client, db_path = client_tmpdb
+    client.post("/v1/spool", json=_lui(20))
+    client.post("/v1/spool", json=_lui(21))
+    assert queued_count(db_path) == 2
+
+    def fake_post(_ingest_url: str, _envelope_json: str, _timeout_seconds: int):
+        return 500, "nope"
+
+    monkeypatch.setattr(drain_mod, "_post", fake_post)
+
+    r = client.post("/v1/drain")
+    assert r.status_code == 200
+    body = r.json()
+    assert body["acked"] == 0
+    assert body["failed"] == 2
+    assert body["conflicts"] == 0
+    assert queued_count(db_path) == 2
+
+
+def test_capacity_limit_rejects_with_507(client_tmpdb, monkeypatch):
+    """
+    Invariant: capacity limits reject intake explicitly.
+    We enforce OUTBOX_MAX_ITEMS=1 for this test via cfg override.
+    """
+    client, db_path = client_tmpdb
+
+    # Tighten capacity in the running app config (deterministic, per-fixture cfg injection).
+    app_mod.cfg.outbox_max_items = 1
+
+    r1 = client.post("/v1/spool", json=_lui(30))
+    assert r1.status_code == 200
+    assert queued_count(db_path) == 1
+
+    r2 = client.post("/v1/spool", json=_lui(31))
+    assert r2.status_code == 507
+    assert queued_count(db_path) == 1
