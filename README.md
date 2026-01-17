@@ -1,3 +1,5 @@
+# README.md
+
 # IAM — Intelligent Augmented Memory
 
 IAM is a system for preserving **cognitive continuity over time**.
@@ -67,17 +69,14 @@ These commitments are enforced through explicit invariants and contracts.
 
 ## Authority Structure (Critical)
 
-If documents conflict, authority resolves **in this order**:
+The **canonical authority order** for this repository is defined in:
 
-1. `architecture/continuity-operating-contract.md`
-2. `architecture/invariants.md`
-3. `core-ontology/glossary.md`
-4. `core-ontology/continuity.md`
-5. Specific contracts (ProvDB, SubDB, CAP)
-6. Architecture overviews and essays
-7. Tools, scripts, prompts
+- `MAP.md`
 
-Anything lower must conform to anything higher.
+This README is not a competing authority list.
+
+If any document here appears to define authority ordering differently than
+`MAP.md`, treat this README as wrong and `MAP.md` as correct.
 
 ---
 
@@ -247,31 +246,3 @@ the repository is incomplete.
 
 This repository is an active architectural and conceptual system.
 Refer to licensing files for usage constraints.
-
-
-### Executable Conformance Artifacts
-
-In addition to tools and scripts, the repository may include **executable
-conformance implementations** that exist solely to *implement* and *test*
-Language Infrastructure (LI) boundaries.
-
-These artifacts are **not authoritative**. They are disposable and replaceable.
-
-They appear under two root directories:
-
-- `services/`  
-  Long-running processes that conform to LI contracts  
-  (e.g. ingestion boundaries, durable spoolers, protocol adapters).
-
-- `sources/`  
-  Executable adapters that emit Language Use Instances (LUIs) from
-  external artifacts or protocols  
-  (e.g. export importers, protocol listeners).
-
-All such artifacts must conform to:
-- LI contracts
-- LI invariants
-- canonical schemas
-
-If an executable conflicts with Language Infrastructure, the executable
-is wrong — never the LI.

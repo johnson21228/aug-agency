@@ -18,6 +18,7 @@
 .PHONY: update-writing-index
 .PHONY: publish-site publish-site-fast publish-site-open
 .PHONY: spooler test-spooler
+.PHONY: li-validate
 
 PYTHON := python3
 
@@ -132,6 +133,13 @@ unpack-repo: verify-pack-repo
 # ------------------------------------------------------
 
 # … remaining sections unchanged …
+
+# ------------------------------------------------------
+# Language Infrastructure validation
+# ------------------------------------------------------
+
+li-validate:
+	$(PYTHON) Tools/li_validate.py
 
 # ------------------------------------------------------
 # Services (conformance implementations)
