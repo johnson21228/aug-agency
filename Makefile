@@ -209,3 +209,16 @@ publish-site-fast: docs
 publish-site-open: publish-site
 	@echo "Opening public site repo ..."
 	cd "$(PUBLIC_SITE_DIR)" && git status
+
+
+
+# Makefile (additions)
+
+.PHONY: spooler test-spooler
+
+spooler:
+	@echo "Starting spooler v0 on :7000"
+	python3 -m uvicorn services.spooler_v0.app:app --host 0.0.0.0 --port 7000 --reload
+
+test-spooler:
+	python3 -m pytest -q services/spooler_v0/tests/test_spooler_v0.py

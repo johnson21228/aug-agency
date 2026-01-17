@@ -247,3 +247,31 @@ the repository is incomplete.
 
 This repository is an active architectural and conceptual system.
 Refer to licensing files for usage constraints.
+
+
+### Executable Conformance Artifacts
+
+In addition to tools and scripts, the repository may include **executable
+conformance implementations** that exist solely to *implement* and *test*
+Language Infrastructure (LI) boundaries.
+
+These artifacts are **not authoritative**. They are disposable and replaceable.
+
+They appear under two root directories:
+
+- `services/`  
+  Long-running processes that conform to LI contracts  
+  (e.g. ingestion boundaries, durable spoolers, protocol adapters).
+
+- `sources/`  
+  Executable adapters that emit Language Use Instances (LUIs) from
+  external artifacts or protocols  
+  (e.g. export importers, protocol listeners).
+
+All such artifacts must conform to:
+- LI contracts
+- LI invariants
+- canonical schemas
+
+If an executable conflicts with Language Infrastructure, the executable
+is wrong — never the LI.
