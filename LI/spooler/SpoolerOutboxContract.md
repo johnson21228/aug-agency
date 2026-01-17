@@ -8,13 +8,13 @@ Status: Canonical
 The spooler provides an **always-available intake surface** that decouples
 external capture from ingest-server availability.
 
-It accepts REST input, normalizes it into LUIs, and durably queues them
-until successful delivery to the ingest server.
+It accepts REST input (with a stable idempotency key), normalizes it into LUIs,
+and durably queues them until successful delivery to the ingest server.
 
 ## Scope
 
 The spooler:
-- accepts REST intake
+- accepts REST intake **with a stable idempotency key (`client_lui_id`)**
 - emits only LUI envelopes
 - persists LUIs durably
 - retries delivery safely
@@ -30,6 +30,18 @@ The spooler does **not**:
 - `POST /v1/drain` (attempt delivery to ingest server)
 - `GET /health`
 - `GET /v1/status` (queued counts only)
+
+### POST /v1/spool — Intake Requirements (v0)
+
+The request body MUST be JSON and MUST contain a stable idempotency key:
+
+- `client_lui_id` (required)
+
+The spooler accepts either:
+- a complete LUI envelope (already shaped for ingest), or
+- any JSON object containing `client_lui_id`, which the spooler will wrap into an LUI envelope.
+
+If `client_lui_id` is missing, the request MUST be rejected (HTTP 400).
 
 ## Output Contract
 
