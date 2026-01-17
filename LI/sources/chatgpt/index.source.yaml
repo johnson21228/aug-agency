@@ -1,21 +1,25 @@
-# LI/sources/chatgpt/index.source.yaml
 version: 0.1
-scope: LI.sources.chatgpt
+scope: LI.sources.openai_actions
 description: >
-  ChatGPT export source defining mapping from exported conversation artifacts
-  to LUIs.
+  OpenAI Actions protocol source defining REST ingress, schema validation,
+  and LUI emission semantics.
 sources:
-  - path: LI/sources/chatgpt/mapping.md
-	role: mapping
+  - path: LI/sources/openai_actions/ActionServerContract.md
+	role: contract
 	authority: canonical
-	notes: Field-level mapping from ChatGPT export to LUI envelope.
+	notes: REST contract and non-goals for Actions-based LUI ingress.
 
-  - path: LI/sources/chatgpt/invariants.md
+  - path: LI/sources/openai_actions/openapi.yaml
+	role: protocol
+	authority: canonical
+	notes: OpenAPI schema for Actions integration.
+
+  - path: LI/sources/openai_actions/invariants.md
 	role: invariants
 	authority: canonical
-	notes: Determinism and replay invariants for ChatGPT-derived LUIs.
+	notes: Deterministic mapping and idempotency invariants.
 
-  - path: sources/chatgpt_export_v0/
+  - path: services/openai_actions_adapter_v0/
 	role: implementation
 	authority: supporting
-	notes: Reference adapter producing LUIs from ChatGPT exports.
+	notes: Reference Actions adapter service (namespace reserved).
