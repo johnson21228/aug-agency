@@ -1,0 +1,21 @@
+# LI/sources/chatgpt/index.source.yaml
+version: 0.1
+scope: LI.sources.chatgpt
+description: >
+  ChatGPT export source defining mapping from exported conversation artifacts
+  to LUIs.
+sources:
+  - path: LI/sources/chatgpt/mapping.md
+	role: mapping
+	authority: canonical
+	notes: Field-level mapping from ChatGPT export to LUI envelope.
+
+  - path: LI/sources/chatgpt/invariants.md
+	role: invariants
+	authority: canonical
+	notes: Determinism and replay invariants for ChatGPT-derived LUIs.
+
+  - path: sources/chatgpt_export_v0/
+	role: implementation
+	authority: supporting
+	notes: Reference adapter producing LUIs from ChatGPT exports.

@@ -1,0 +1,21 @@
+# LI/sources/index.source.yaml
+version: 0.1
+scope: LI.sources
+description: >
+  Authoritative language-infrastructure scope defining LUI source classes and
+  their conformance surfaces. Sources emit LUIs and hand off to the spooler.
+sources:
+  - path: LI/sources/README.md
+	role: scope
+	authority: canonical
+	notes: Defines what constitutes an LUI source and shared invariants.
+
+  - path: LI/sources/chatgpt/index.source.yaml
+	role: source_scope
+	authority: canonical
+	notes: ChatGPT export source specification.
+
+  - path: LI/sources/openai_actions/index.source.yaml
+	role: source_scope
+	authority: canonical
+	notes: OpenAI Actions protocol source specification.
