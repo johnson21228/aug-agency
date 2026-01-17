@@ -1,0 +1,38 @@
+// LI/spooler/index.source.json
+{
+  "version": "0.1",
+  "scope": "LI.spooler",
+  "description": "Authoritative language-infrastructure sources defining the spooler/outbox boundary (REST intake -> durable queue -> push to ingest server).",
+  "sources": [
+	{
+	  "path": "LI/spooler/SpoolerOutboxContract.md",
+	  "role": "contract",
+	  "authority": "canonical",
+	  "notes": "Spooler responsibilities, boundaries, and non-goals."
+	},
+	{
+	  "path": "LI/spooler/invariants.md",
+	  "role": "invariants",
+	  "authority": "canonical",
+	  "notes": "Durable outbox and retry invariants."
+	},
+	{
+	  "path": "services/spooler_v0/app.py",
+	  "role": "implementation",
+	  "authority": "supporting",
+	  "notes": "Reference v0 spooler implementation (non-authoritative)."
+	},
+	{
+	  "path": "services/spooler_v0/outbox.py",
+	  "role": "implementation",
+	  "authority": "supporting",
+	  "notes": "Durable outbox storage logic."
+	},
+	{
+	  "path": "services/spooler_v0/tests/test_spooler_v0.py",
+	  "role": "tests",
+	  "authority": "supporting",
+	  "notes": "Executable conformance tests."
+	}
+  ]
+}
