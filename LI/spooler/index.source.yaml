@@ -14,16 +14,7 @@ sources:
     authority: canonical
     notes: Normative spooler contract including resource envelope and failure semantics.
 
-  - path: LI/spooler/invariants.md
-    role: invariants
-    authority: canonical
-    notes: Durable outbox invariants and minimal executable test surface.
-
-  - path: services/spooler_v0/README.md
-    role: implementation_notes
-    authority: supporting
-    notes: Non-authoritative service notes.
-
+...
   - path: services/spooler_v0/app.py
     role: implementation
     authority: supporting
@@ -34,7 +25,7 @@ sources:
     authority: supporting
     notes: Durable outbox storage.
 
-  - path: services/spooler_v0/tests/test_spooler_v0.py
+  - path: services/spooler_v0/test_spooler_v0.py
     role: tests
     authority: supporting
     notes: Executable conformance checks for spooler invariants.

@@ -1,7 +1,7 @@
 {
   "version": "0.2",
   "scope": "LI.spooler",
-  "description": "Authoritative language-infrastructure sources defining the spooler/outbox boundary (REST intake -> durable queue -> push to ingest server).",
+  "description": "Authoritative language-infrastructure sources defining the spoo...undary (REST intake -> durable queue -> push to ingest server).",
   "sources": [
     {
       "path": "LI/spooler/README.md",
@@ -19,13 +19,7 @@
       "path": "LI/spooler/invariants.md",
       "role": "invariants",
       "authority": "canonical",
-      "notes": "Durable outbox invariants and minimal executable test surface."
-    },
-    {
-      "path": "services/spooler_v0/README.md",
-      "role": "implementation_notes",
-      "authority": "supporting",
-      "notes": "Non-authoritative service notes."
+      "notes": "Normative invariants for durable outbox + replay semantics."
     },
     {
       "path": "services/spooler_v0/app.py",
@@ -34,13 +28,19 @@
       "notes": "Reference v0 spooler service."
     },
     {
+      "path": "services/spooler_v0/lui_normalize.py",
+      "role": "implementation",
+      "authority": "supporting",
+      "notes": "LUI envelope normalization."
+    },
+    {
       "path": "services/spooler_v0/outbox.py",
       "role": "implementation",
       "authority": "supporting",
       "notes": "Durable outbox storage."
     },
     {
-      "path": "services/spooler_v0/tests/test_spooler_v0.py",
+      "path": "services/spooler_v0/test_spooler_v0.py",
       "role": "tests",
       "authority": "supporting",
       "notes": "Executable conformance checks for spooler invariants."
