@@ -128,7 +128,11 @@ def enqueue(
 
 			conn.execute("COMMIT;")
 		except Exception:
-			conn.execute("ROLLBACK;")
+			# Conflict path commits before raising; after COMMIT there is no active txn.
+			try:
+				conn.execute("ROLLBACK;")
+			except sqlite3.OperationalError:
+				pass
 			raise
 	finally:
 		conn.close()
