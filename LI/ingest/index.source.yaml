@@ -1,41 +1,41 @@
-# LI/ingest/index.source.yaml
-version: 0.1
-scope: LI.ingest
+# LI/spooler/index.source.yaml
+version: 0.2
+scope: LI.spooler
 description: >
-  Authoritative language-infrastructure sources defining the ingest boundary
-  (REST -> append-only capture -> iam.db) and its executable conformance surface.
+  Authoritative language-infrastructure sources defining the spooler/outbox
+  boundary (REST intake -> durable queue -> push to ingest server).
 sources:
-  - path: architecture/ingestion-server/IngestServerContract.md
+  - path: LI/spooler/README.md
+	role: scope
+	authority: canonical
+	notes: Defines spooler boundary and purpose.
+
+  - path: LI/spooler/SpoolerOutboxContract.md
 	role: contract
 	authority: canonical
-	notes: REST ingest boundary; LUI admissibility; idempotency; ordering; non-goals.
+	notes: Normative spooler contract including resource envelope and failure semantics.
 
-  - path: Migrations/0001_capture_contract.sql
-	role: schema
-	authority: canonical
-	notes: Capture authority schema for iam.db; append-only substrate for ingestion.
-
-  - path: code/ingest/ingest_chatgpt_export.py
-	role: adapter
-	authority: supporting
-	notes: Offline adapter example; demonstrates LUI-to-capture mapping into iam.db.
-
-  - path: code/provDB/build_provdb_core.py
-	role: downstream_builder
-	authority: supporting
-	notes: Downstream consumer of capture authority; establishes dependency direction.
-
-  - path: code/subDB/build_subdb_core.py
-	role: downstream_builder
-	authority: supporting
-	notes: Downstream consumer; numeric substrate build from derived structures.
-
-  - path: ingestion-server/README.md
-	role: implementation_notes
-	authority: supporting
-	notes: Repo-local notes for ingestion server implementation (if present).
-
-  - path: LI/ingest/invariants.md
+  - path: LI/spooler/invariants.md
 	role: invariants
 	authority: canonical
-	notes: Executable invariants for ingest boundary; must remain stable across changes.
+	notes: Durable outbox invariants and minimal executable test surface.
+
+  - path: services/spooler_v0/README.md
+	role: implementation_notes
+	authority: supporting
+	notes: Non-authoritative service notes.
+
+  - path: services/spooler_v0/app.py
+	role: implementation
+	authority: supporting
+	notes: Reference v0 spooler service (FastAPI).
+
+  - path: services/spooler_v0/outbox.py
+	role: implementation
+	authority: supporting
+	notes: Durable outbox storage.
+
+  - path: services/spooler_v0/tests/test_spooler_v0.py
+	role: tests
+	authority: supporting
+	notes: Executable conformance checks for spooler invariants.
