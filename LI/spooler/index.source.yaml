@@ -1,31 +1,46 @@
 version: 0.2
 scope: LI.spooler
 description: >
-  Authoritative language-infrastructure sources defining the spooler/outbox
-  boundary (REST intake -> durable queue -> push to ingest server).
+  Authoritative language-infrastructure sources defining the spooler / intake
+  boundary (REST intake -> durable queue -> downstream drain to ingest server).
+
 sources:
   - path: LI/spooler/README.md
     role: scope
     authority: canonical
-    notes: Defines spooler boundary and purpose.
+    notes: >
+      Defines the spooler role as an always-on Intake Boundary and describes
+      the layered API planes (schema, adapters, canonical intake, drain).
 
   - path: LI/spooler/SpoolerOutboxContract.md
     role: contract
     authority: canonical
-    notes: Normative spooler contract including resource envelope and failure semantics.
+    notes: >
+      Normative spooler contract including resource envelope, idempotency,
+      replay safety, and failure semantics.
 
-...
   - path: services/spooler_v0/app.py
     role: implementation
     authority: supporting
-    notes: Reference v0 spooler service.
+    notes: >
+      Reference v0 spooler service implementation providing REST surfaces
+      for intake, status, and drain.
 
   - path: services/spooler_v0/outbox.py
     role: implementation
     authority: supporting
-    notes: Durable outbox storage.
+    notes: >
+      Durable outbox storage implementation used by the spooler service.
+
+  - path: services/spooler_v0/adapters/openai_actions/gpt_handler.py
+    role: implementation
+    authority: supporting
+    notes: >
+      GPT Actions adapter implementing a source-specific ingress shape that
+      adapts agent-generated payloads into the canonical spooler intake.
 
   - path: services/spooler_v0/test_spooler_v0.py
     role: tests
     authority: supporting
-    notes: Executable conformance checks for spooler invariants.
+    notes: >
+      Executable conformance checks validating spooler invariants.

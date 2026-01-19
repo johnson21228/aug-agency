@@ -1,18 +1,80 @@
-# LI/spooler/README.md
+## Role: Intake Boundary (Spooler Service)
 
-This LI scope defines the **spooler / outbox boundary** for IAM.
+The spooler service implements the **Intake Boundary** role in the system.
 
-The spooler is an **always-on intake surface** that:
-- Accepts REST input **only when a stable idempotency key (`client_lui_id`) is present**
-- Normalizes input into LUI envelopes
-- Persists LUIs durably in a local outbox
-- Pushes LUIs to the ingest server when available
+This role is defined as an **always-on, durable entry point** for external events
+(Language-Use Inputs, or LUIs), decoupled from downstream ingestion and processing.
 
-“Accepts REST input” means:
-- The payload shape may be arbitrary JSON
-- Replay-safety requires an explicit idempotency key (`client_lui_id`)
+The Intake Boundary has the following invariants:
 
-The spooler **is not capture authority**.
-It must never write to `iam.db`.
+- Persistence occurs **before acknowledgment**.
+- Replay safety is enforced via a stable idempotency key (`client_lui_id`).
+- Downstream ingest services may be unavailable without blocking intake.
+- Deployment substrate is not semantically relevant (edge device, workstation, cloud).
 
-The spooler exists to decouple capture availability from capture authority uptime.
+The current implementation of this role is the `spooler` service.
+
+---
+
+## API Planes
+
+The spooler service exposes several API planes, each with a distinct purpose.
+These planes are layered and should not be conflated.
+
+### 1. Schema / Control Plane
+
+Endpoints used for **schema discovery and tooling integration**.
+
+- `GET /openai.json`  
+  Returns an OpenAPI document suitable for GPT Actions import.
+
+- `GET /openapi.json`  
+  Default FastAPI OpenAPI endpoint.
+
+These endpoints do not participate in data capture.
+
+---
+
+### 2. Adapter Plane (External Call Shapes)
+
+Endpoints that accept **source-specific or agent-specific payloads** and adapt them
+into the canonical intake contract.
+
+Adapters may:
+- validate minimally
+- derive canonical fields (e.g., `client_lui_id`)
+- attach source metadata
+
+Adapters must:
+- terminate in a durable enqueue equivalent to the canonical intake
+- preserve Intake Boundary invariants
+
+Examples:
+- `POST /spool` (GPT Actions adapter)
+- future adapters for webhooks, CLI tools, on-device clients
+
+---
+
+### 3. Canonical Intake Plane
+
+The canonical, invariant-preserving intake API.
+
+- `POST /v1/spool`
+
+This endpoint:
+- requires a stable idempotency key
+- enforces replay and capacity semantics
+- persists before acknowledgment
+
+Adapters must converge to this contract either directly or in-process.
+
+---
+
+### 4. Delivery / Drain Plane
+
+Endpoints concerned with downstream delivery, not capture.
+
+- `POST /v1/drain`
+- `GET /v1/status`
+
+These endpoints do not affect intake correctness and may be invoked opportunistically.
