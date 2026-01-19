@@ -1,0 +1,24 @@
+## Add: `LI/derive/index.source.yaml` (canonical index)
+
+```yaml
+version: 0.1
+scope: LI.derive
+description: >
+  Canonical language-infrastructure sources defining append-only functional
+  derivation from captured LUIs (iam.db) to derived artifacts (chunks,
+  semantic coordinates, continuity nodes) suitable for storage in SubDB.
+sources:
+  - path: LI/derive/README.md
+    role: scope
+    authority: canonical
+    notes: Defines append-only functional derivation invariants and engine boundary.
+
+  - path: LI/derive/ContinuityNodeContract.md
+    role: contract
+    authority: canonical
+    notes: Minimal required schema for continuity nodes and provenance.
+
+  - path: LI/derive/ChunkingContract.md
+    role: contract
+    authority: canonical
+    notes: Continuity-preserving chunking contract for bounded-context inference.
