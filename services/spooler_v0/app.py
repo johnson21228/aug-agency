@@ -1,10 +1,13 @@
 from __future__ import annotations
 
-import os
+import json
+from typing import Any, Dict, Optional
+
 from fastapi import FastAPI, Request
 from fastapi.openapi.utils import get_openapi
 from fastapi.responses import JSONResponse
 
+from .adapters.openai_actions.gpt_handler import router as openai_actions_router
 from .config import load_config
 from .drain import drain_once
 from .lui_normalize import canonical_json, normalize_any_rest_payload_to_lui
@@ -14,15 +17,13 @@ from .outbox import (
     OutboxError,
     enqueue,
     init_outbox,
+    peek_queued,
     queued_count,
 )
 
-from .adapters.openai_actions.gpt_handler import router as openai_actions_router
-
-
-# -----------------------------------------------------------------------------
-# App initialization
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Init
+# ------------------------------------------------------------------------------
 
 cfg = load_config()
 init_outbox(cfg.outbox_db_path)
@@ -40,24 +41,17 @@ app = FastAPI(
     ),
 )
 
-
-# -----------------------------------------------------------------------------
-# Routers (adapters)
-# -----------------------------------------------------------------------------
-
-# GPT Actions adapter (POST /spool)
+# Adapter plane (GPT Actions)
 app.include_router(openai_actions_router, tags=["actions"])
 
-
-# -----------------------------------------------------------------------------
-# OpenAPI handling
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# OpenAPI handling (stable + GPT-friendly)
+# ------------------------------------------------------------------------------
 
 def _custom_openapi():
     """
-    Generate OpenAPI schema without injecting servers.
-
-    Base URL is inferred from the request origin (ngrok / proxy friendly).
+    Generate OpenAPI schema WITHOUT baked-in servers.
+    servers[] will be injected dynamically by /openai.json.
     """
     if app.openapi_schema:
         return app.openapi_schema
@@ -77,9 +71,14 @@ app.openapi = _custom_openapi  # type: ignore[assignment]
 
 @app.get("/openai.json", include_in_schema=False)
 def openai_json(request: Request):
+    """
+    OpenAPI document endpoint for GPT Actions import.
+
+    Injects a valid servers[0].url derived from the incoming request
+    (ngrok, reverse proxy, local dev, etc.).
+    """
     schema = app.openapi()
 
-    # Prefer proxy headers (ngrok sets these)
     proto = request.headers.get("x-forwarded-proto") or request.url.scheme or "https"
     host = request.headers.get("x-forwarded-host") or request.headers.get("host")
 
@@ -91,10 +90,9 @@ def openai_json(request: Request):
     schema["servers"] = [{"url": base_url}]
     return JSONResponse(schema)
 
-
-# -----------------------------------------------------------------------------
-# Health & observability
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
+# Internal / operational endpoints
+# ------------------------------------------------------------------------------
 
 @app.get(
     "/health",
@@ -116,9 +114,78 @@ def status():
     return {"queued": queued_count(cfg.outbox_db_path)}
 
 
-# -----------------------------------------------------------------------------
-# Canonical intake (HIDDEN from GPT Actions)
-# -----------------------------------------------------------------------------
+def _summarize_envelope(envelope: Dict[str, Any], *, max_text: int = 400) -> Dict[str, Any]:
+    source = envelope.get("source") if isinstance(envelope.get("source"), dict) else {}
+    payload = envelope.get("payload") if isinstance(envelope.get("payload"), dict) else {}
+
+    text: Optional[str] = None
+    if isinstance(payload.get("text"), str):
+        text = payload["text"]
+    elif isinstance(payload.get("message_raw"), str):
+        text = payload["message_raw"]
+
+    if text is not None and len(text) > max_text:
+        text = text[: max_text - 3] + "..."
+
+    return {
+        "captured_at": envelope.get("captured_at"),
+        "kind": envelope.get("kind"),
+        "source_client": source.get("client"),
+        "source_agent": source.get("agent"),
+        "payload_keys": sorted(list(payload.keys())) if isinstance(payload, dict) else [],
+        "payload_text_preview": text,
+    }
+
+
+@app.get(
+    "/v1/peek",
+    include_in_schema=False,
+    summary="Peek queued outbox items (read-only)",
+    description="Read-only inspection of queued outbox items. Does not mutate state.",
+    tags=["internal"],
+)
+def peek(limit: int = 10, offset: int = 0, full: bool = False):
+    rows = peek_queued(cfg.outbox_db_path, limit=limit, offset=offset)
+
+    items = []
+    for r in rows:
+        try:
+            env = json.loads(r["envelope_json"])
+        except Exception:
+            env = None
+
+        item = {
+            "id": r["id"],
+            "client_lui_id": r["client_lui_id"],
+            "envelope_bytes": r["envelope_bytes"],
+            "created_at": r["created_at"],
+            "attempt_count": r["attempt_count"],
+            "last_attempt_at": r["last_attempt_at"],
+            "last_error": r["last_error"],
+        }
+
+        if isinstance(env, dict):
+            item["summary"] = _summarize_envelope(env)
+            if full:
+                item["envelope"] = env
+                item["envelope_json"] = r["envelope_json"]
+        else:
+            item["summary"] = {"parse_error": True}
+            if full:
+                item["envelope_json"] = r["envelope_json"]
+
+        items.append(item)
+
+    return {
+        "count": len(items),
+        "limit": limit,
+        "offset": offset,
+        "items": items,
+    }
+
+# ------------------------------------------------------------------------------
+# Canonical intake (non-adapter)
+# ------------------------------------------------------------------------------
 
 @app.post(
     "/v1/spool",
@@ -126,7 +193,7 @@ def status():
     summary="Durably enqueue an IAM LUI envelope",
     description=(
         "Canonical intake endpoint.\n\n"
-        "Requires a stable idempotency key (client_lui_id).\n"
+        "Requires stable idempotency key (client_lui_id).\n"
         "Persists before acknowledgment.\n"
         "Replay-safe and capacity-aware."
     ),
@@ -183,10 +250,9 @@ async def spool(request: Request):
             content={"error": {"code": "INVALID_LUI", "message": str(e)}},
         )
 
-
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 # Drain
-# -----------------------------------------------------------------------------
+# ------------------------------------------------------------------------------
 
 @app.post(
     "/v1/drain",
