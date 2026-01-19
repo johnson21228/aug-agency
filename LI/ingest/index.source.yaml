@@ -14,6 +14,11 @@ sources:
     authority: canonical
     notes: Capture authority schema for iam.db; append-only substrate for ingestion.
 
+  - path: services/ingest_server_v0/app.py
+    role: implementation
+    authority: supporting
+    notes: Minimal ingest logger implementing POST /v1/luis for spooler drain testing (dev sink).
+
   - path: code/ingest/ingest_chatgpt_export.py
     role: adapter
     authority: supporting

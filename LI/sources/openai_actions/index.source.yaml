@@ -19,7 +19,12 @@ sources:
     authority: canonical
     notes: Deterministic mapping and idempotency invariants.
 
-  - path: services/openai_actions_adapter_v0/
+  - path: LI/sources/openai_actions/CapturePolicy.md
+    role: policy
+    authority: canonical
+    notes: Canonical capture trigger/payload policy for volitional ChatGPT Actions capture.
+
+  - path: services/spooler_v0/adapters/openai_actions/gpt_handler.py
     role: implementation
     authority: supporting
-    notes: Reference Actions adapter service (namespace reserved).
+    notes: Reference Actions ingress adapter implemented as a spooler adapter endpoint.
