@@ -17,4 +17,4 @@ sources:
   - path: sources/chatgpt_export_v0/
     role: implementation
     authority: supporting
-    notes: Reference adapter producing LUIs from ChatGPT exports.
+    notes: Reference adapter producing LUIs from ChatGPT exports and posting to spooler.
