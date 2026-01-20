@@ -10,6 +10,16 @@ This document is canonical for LI.ingest. If code or contracts diverge from thes
 
 ## Invariants
 
+### I0 — Bootstrap state validity (empty or missing capture store)
+
+The system MUST treat an empty or non-existent `iam.db` as a valid initial condition.
+
+- The absence of `iam.db` or the absence of capture rows denotes “no captured history,” not an error.
+- Ingest MUST be able to initialize the capture store schema and begin accepting LUIs from this state.
+- Append-only, idempotency, and replay-safety invariants apply from the first accepted record onward.
+
+---
+
 ### I1 — LUI-only input
 No data enters IAM except as an LUI (or batch of LUIs) expressed through a declared ingest interface.
 

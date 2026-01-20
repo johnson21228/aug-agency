@@ -22,4 +22,6 @@ Ingest participates in a restartable chew-loop pipeline.
 - When ingest returns, backlog is drained and appended without rewriting history.
 - Downstream derivation consumes append-only capture using durable monotonic checkpoints.
 
+Bootstrap validity (empty or missing `iam.db`) is a required ingest invariant; see `LI/ingest/invariants.md`.
+
 The canonical execution invariant is defined in `LI/derive/README.md`.
