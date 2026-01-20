@@ -78,3 +78,11 @@ Endpoints concerned with downstream delivery, not capture.
 - `GET /v1/status`
 
 These endpoints do not affect intake correctness and may be invoked opportunistically.
+
+---
+
+## Pipeline execution model
+
+The spooler participates in a restartable chew-loop pipeline: upstream intake continues
+while downstream systems are unavailable, and delivery is retried without losing history.
+The canonical execution invariant is defined in `LI/derive/README.md`.
