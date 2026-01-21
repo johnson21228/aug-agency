@@ -12,17 +12,24 @@ sources:
   - path: Migrations/0001_capture_contract.sql
     role: schema
     authority: canonical
-    notes: Capture authority schema for iam.db; append-only substrate for ingestion.
+    notes: >
+      Capture authority schema for iam.db; append-only substrate for ingestion.
+      This scope is block-canonical: schema must support canonical block capture.
 
   - path: services/ingest_server_v0/app.py
     role: implementation
     authority: supporting
-    notes: Minimal ingest logger implementing POST /v1/luis for spooler drain testing (dev sink).
+    notes: >
+      Minimal ingest logger implementing POST /v1/luis for spooler drain testing (dev sink).
+      Must conform to LI/ingest/invariants.md and the canonical migration schema.
 
   - path: code/ingest/ingest_chatgpt_export.py
     role: adapter
     authority: supporting
-    notes: Offline adapter example; demonstrates LUI-to-capture mapping into iam.db.
+    notes: >
+      Offline adapter example. For this scope, adaptors should prefer block-canonical
+      envelopes when the source supports maximal blocks. Turn-level emission may exist
+      as a derived/supporting mode.
 
   - path: code/provDB/build_provdb_core.py
     role: downstream_builder
@@ -37,4 +44,4 @@ sources:
   - path: LI/ingest/invariants.md
     role: invariants
     authority: canonical
-    notes: Executable invariants for ingest boundary; must remain stable across changes.
+    notes: Executable invariants for ingest boundary; block-canonical capture; replay/versioning rules.

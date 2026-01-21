@@ -25,3 +25,15 @@ Ingest participates in a restartable chew-loop pipeline.
 Bootstrap validity (empty or missing `iam.db`) is a required ingest invariant; see `LI/ingest/invariants.md`.
 
 The canonical execution invariant is defined in `LI/derive/README.md`.
+
+---
+
+## Block-canonical capture (current intent)
+
+This scope is **block-canonical**:
+
+- Canonical capture in `iam.db` must preserve maximal experience blocks losslessly when available.
+- Segmentation into turns/nodes/chunks is treated as a downstream “chewing artifact.”
+- Multiple segmentations over the same captured block may coexist (e.g., fine-grained turns vs macroturns).
+
+This separation ensures that the capture authority preserves full breadth while leaving interpretive structure flexible downstream.
