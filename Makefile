@@ -137,10 +137,14 @@ bootstrap-status:
 	@echo "iam.db:"
 	@ls -lh "$(BOOT_IAM_DB)" 2>/dev/null || echo "(missing)"
 
+
+
+.PHONY: li-validate
+li-validate:
+	$(PYTHON) tools/li_validate.py
+
+	
 # =============================================================================
 # End of Makefile
 # =============================================================================
 
-.PHONY: li-validate
-li-validate:
-	python3 Tools/li_validate.py
