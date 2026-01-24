@@ -143,6 +143,19 @@ bootstrap-status:
 li-validate:
 	$(PYTHON) tools/li_validate.py
 
+
+# ---------- Packaging ----------
+
+PACK_DIR ?= dist
+PACK_REPO_ZIP ?= $(PACK_DIR)/augmented-agency-pack-repo.zip
+
+.PHONY: pack-repo pack-li
+pack-repo: pack-li
+
+pack-li:
+	@mkdir -p $(PACK_DIR)
+	$(PYTHON) Tools/pack_li.py --out $(PACK_REPO_ZIP)
+	@echo "Wrote $(PACK_REPO_ZIP)"
 	
 # =============================================================================
 # End of Makefile
