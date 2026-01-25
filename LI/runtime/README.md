@@ -87,3 +87,14 @@ The runtime continuity layer translates captured experience into a **navigable s
 - local interpretation
 - rebuildability
 - non-authority of derived structures
+
+
+## Runtime Behavior
+
+Behavioral contracts governing attention capture, breadcrumb formation,
+and SubDB append semantics are defined in:
+
+- `behavior.md`
+
+These contracts specify what MUST occur when language crosses an attention
+boundary, independent of platform or implementation.
