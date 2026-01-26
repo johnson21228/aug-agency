@@ -1,16 +1,65 @@
-Rules in this directory MUST NOT:
+# Runtime Continuity Layer
+
+## Canonical Definition
+
+The authoritative definition of IAM runtime behavior is specified in:
+
+**`LI/runtime/core_loop.md`**
+
+That document defines:
+- the minimal continuity loop
+- the role of continuons and SubDB
+- the boundary between persistence and runtime
+- the non-authority of derived semantics
+
+All files in this directory MUST be consistent with the core loop.
+No file in this directory may expand, reinterpret, or supersede it.
+
+---
+
+## Authority Boundary
+
+Files in this directory MUST NOT:
 - modify substrate history
 - assert global semantics
-- infer importance or correctness
+- infer meaning, importance, or correctness
+- persist derived structures as authoritative
+
+All runtime structures are:
+- derived
+- discardable
+- rebuildable from SubDB
 
 ---
 
 ## Files in This Directory
 
+### `core_loop.md`
+Defines the **canonical continuity loop**.
+- compression of language-use into continuons
+- SubDB sufficiency
+- runtime anchoring and probing
+- re-entry without reconstruction
+
+This file is the compression spine of the runtime layer.
+
+---
+
+### `behavior.md`
+Defines **when and how continuons are formed**.
+- attention boundary events
+- capture rules
+- embedding as measurement
+- SubDB append semantics
+
+This file specifies the ingest contract at runtime.
+
+---
+
 ### `anchors.md`
 Defines **where the user stands**.
 - anchor semantics
-- ephemeral vs declared anchors
+- implicit vs declared anchors
 - default anchor rule
 - anchor suggestion constraints
 
@@ -52,28 +101,33 @@ The manifold enables navigation across experience without global coherence.
 ---
 
 ## Authority Invariant
+
 No file in this directory is authoritative over meaning.
 
 All runtime structures:
-- must resolve to concrete events in `iam.db`
+- must resolve to concrete continuons in SubDB
 - must be discardable and recomputable
 - must preserve explicit human control
 
 ---
 
 ## Design Principle
-Meaning emerges through **anchored navigation of experienced trajectories**, not through automated semantic collapse.
+
+Meaning emerges through **anchored navigation of experienced trajectories**,
+not through automated semantic collapse.
 
 The runtime layer exists to make that navigation possible.
 
 ---
 
 ## Non-Goals
+
 This directory intentionally excludes:
 - UI definitions
 - visualization rules
 - embedding strategies
-- global semantic models
+- model selection
+- global semantic ontologies
 - enterprise coherence frameworks
 
 Those belong to higher layers.
@@ -81,20 +135,15 @@ Those belong to higher layers.
 ---
 
 ## Summary
-The runtime continuity layer translates captured experience into a **navigable semantic manifold** while preserving:
-- event grounding
+
+The runtime continuity layer translates captured experience into a
+**navigable semantic manifold** while preserving:
+
+- continuity of attention
 - human agency
 - local interpretation
 - rebuildability
-- non-authority of derived structures
+- non-authority of derived semantics
 
-
-## Runtime Behavior
-
-Behavioral contracts governing attention capture, breadcrumb formation,
-and SubDB append semantics are defined in:
-
-- `behavior.md`
-
-These contracts specify what MUST occur when language crosses an attention
-boundary, independent of platform or implementation.
+The canonical loop is defined in `core_loop.md`.
+Everything here refines it.
