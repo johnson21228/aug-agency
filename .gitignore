@@ -154,3 +154,11 @@ logs/
 
 # Repo-local hooks are not part of reasons-only surface
 .githooks/
+
+# reasons-only boundary: keep implementation/tooling out of the tracked surface
+code/
+config/
+ingestion-server/
+migrations/
+services/
+tools/
