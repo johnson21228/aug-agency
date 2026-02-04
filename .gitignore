@@ -151,3 +151,6 @@ logs/
 .idea/
 .vscode/
 *.swp
+
+# Repo-local hooks are not part of reasons-only surface
+.githooks/
