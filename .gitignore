@@ -162,3 +162,8 @@ ingestion-server/
 migrations/
 services/
 tools/
+
+# carve back in minimal pack tooling
+!tools/
+!tools/pack_md_repo.py
+!tools/pack_repo.py
