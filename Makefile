@@ -154,10 +154,30 @@ pack-repo: pack-li
 
 pack-li:
 	@mkdir -p $(PACK_DIR)
-	$(PYTHON) Tools/pack_li.py --out $(PACK_REPO_ZIP)
+	$(PYTHON) tools/pack_li.py --out $(PACK_REPO_ZIP)
 	@echo "Wrote $(PACK_REPO_ZIP)"
 	
 # =============================================================================
 # End of Makefile
 # =============================================================================
+
+
+# -----------------------------------------------------------------------------
+# Workbench / LI re-entry operator targets
+# -----------------------------------------------------------------------------
+
+.PHONY: verify pack clean-pack
+
+verify: li-validate
+	@test -f README.md
+	@test -d LI
+	@test -f LI/li_governed_workflow.md
+	@test -f prompts/return_to_work.md
+	@test -f tools/pack_li.py
+	@echo "augmented-agency verification passed"
+
+pack: pack-li
+
+clean-pack:
+	rm -rf "$(PACK_DIR)"
 
