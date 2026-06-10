@@ -246,3 +246,25 @@ the repository is incomplete.
 
 This repository is an active architectural and conceptual system.
 Refer to licensing files for usage constraints.
+
+---
+
+## Operator workflow
+
+This repo now supports the common LI-governed re-entry loop:
+
+```bash
+make verify
+make pack
+```
+
+The pack target writes a current LLM/re-entry pack under `dist/`.
+
+For future LLM sessions, begin with:
+
+```text
+prompts/return_to_work.md
+```
+
+and treat the repo files, LI, and current pack as authoritative over platform memory.
+
