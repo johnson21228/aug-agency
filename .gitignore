@@ -175,3 +175,6 @@ patent/**/.DS_Store
 patent/Update_3_9_26/
 patent/provisional/DraftWitiamcherence.md
 patent/provisional/provisional2.pdf
+
+# Generated Workbench repo inventory snapshots
+artifacts/workbench_repo_inventory_*.md
