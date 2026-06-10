@@ -1,6 +1,3 @@
-## Add: `LI/derive/index.source.yaml` (canonical index)
-
-```yaml
 version: 0.1
 scope: LI.derive
 description: >
@@ -22,3 +19,13 @@ sources:
     role: contract
     authority: canonical
     notes: Continuity-preserving chunking contract for bounded-context inference.
+
+  - path: LI/derive/invariants.md
+    role: invariants
+    authority: canonical
+    notes: Derivation invariants that must hold across chunking and continuity-node construction.
+
+  - path: LI/derive/mapping.md
+    role: mapping
+    authority: canonical
+    notes: Mapping from captured language-use inputs to derived continuity artifacts.
