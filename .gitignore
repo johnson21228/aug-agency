@@ -167,3 +167,11 @@ tools/
 !tools/
 !tools/pack_md_repo.py
 !tools/pack_repo.py
+
+# Local/private patent drafting artifacts
+.DS_Store
+patent/.DS_Store
+patent/**/.DS_Store
+patent/Update_3_9_26/
+patent/provisional/DraftWitiamcherence.md
+patent/provisional/provisional2.pdf
