@@ -22,6 +22,10 @@ pack: history clean-li
 	zip -r "$(PACK_PATH)" . \
 		-x ".git/*" \
 		-x ".git/**" \
+		-x ".venv/*" \
+		-x ".venv/**" \
+		-x "venv/*" \
+		-x "venv/**" \
 		-x "dist/*.zip" \
 		-x "artifacts/workbench_repo_inventory_*.md" \
 		-x "__pycache__/*" \
