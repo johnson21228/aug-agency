@@ -1,4 +1,4 @@
-# SPINE — Augmented Agency / IAM
+# SPINE — Augmented Agency / IAM Workbench
 
 ## Spine
 
@@ -6,21 +6,28 @@ Augmented Agency / IAM is a Language Infrastructure project for preserving cogni
 
 The repository's purpose is not to replace reasoning systems. It gives future reasoning systems a governed continuity surface to attach to.
 
-## Current governance update
+## Workbench update
 
-The Workbench template contributes a reusable insight:
+This repo now matches the current Workbench LI template operating pattern while preserving its IAM domain authority.
+
+Workbench contributes the durable operating loop:
 
 ```text
-Experience -> Capture Back -> governed continuity -> Experiential Intelligence -> guidance for future Inference Infrastructure.
+latest pack -> LLM reasoning -> repo changes -> local execution -> verify -> commit -> updated pack -> repeat
 ```
-
-This is accepted here only insofar as it strengthens the repo's existing IAM / Language Infrastructure authority.
 
 ## Operational spine
 
 - `MAP.md` defines authority.
-- `README.md` explains the project.
-- `LI/` contains language-infrastructure contracts and workflow rules.
-- `writing/` and `architecture/` carry conceptual and structural authority.
-- `tools/` supports validation, packing, and site/build workflows.
-- patent/provisional material is review-sensitive.
+- `README.md` explains the IAM project.
+- Uppercase `LI/` contains existing IAM language-infrastructure contracts and workflow rules.
+- Lowercase `li/` contains imported Workbench operating governance.
+- `writing/` and `architecture/` carry conceptual and structural authority where present.
+- `tools/` supports validation, packing, inventory, and site/build workflows.
+- `patent/` and provisional material are review-sensitive.
+
+## Governing idea
+
+Experience becomes usable only when it is captured back into governed continuity.
+
+Inference can visit. It does not own the house.

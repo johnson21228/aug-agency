@@ -90,4 +90,4 @@ Inference can visit. It does not own the house.
 
 ## Repo-specific placement
 
-Core conceptual/architecture home: continuity, derived guidance, append-only capture, privacy, and future endpoint design.
+Reusable template home: make this a starter pattern for future Workbenches.

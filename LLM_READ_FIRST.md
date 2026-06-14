@@ -1,37 +1,58 @@
-# LLM_READ_FIRST — Augmented Agency / IAM Repo
+# LLM_READ_FIRST — Augmented Agency / IAM Workbench
 
 Read this before answering from this repository.
 
-## Role
+This repo is an Augmented Agency / IAM Language Infrastructure repository that now carries the current Workbench LI template operating surface.
 
-You are helping reason with a Language Infrastructure repository. Chat is not the system of record. The repository is the continuity authority.
+## Required first move
+
+Before answering, editing, generating, summarizing, or recommending changes:
+
+1. Open `MAP.md`.
+2. Identify whether the task is about IAM domain authority or Workbench operating process.
+3. Identify the task-specific governing files.
+4. Separate authority from evidence.
+5. Make changes at the governing layer first.
+6. Regenerate generated artifacts from the governing layer.
+7. Verify before claiming success.
 
 ## Authority order
 
-Use `MAP.md` as the authority map. In this repo, uppercase `LI/` is the active language-infrastructure surface.
+Use this repo-specific authority order:
 
-Do not assume the generic Workbench template file layout is higher authority than this repo's existing `MAP.md`, `README.md`, architecture, writing, and `LI/` structure.
+1. Human/domain owner judgment.
+2. `MAP.md` and existing IAM domain authority (`writing/`, `architecture/`, uppercase `LI/`, `core-ontology/`, `patent/`, `embodiments/`).
+3. Workbench operating LI (`li/`, `HOW_LI_RULES.md`, `SPINE.md`, tools, Makefile, prompts, cards).
+4. Git history.
+5. Tests, verifiers, generators, and Makefile targets.
+6. Continuity cards and source-context maps.
+7. Generated artifacts as evidence only.
+8. LLM interpretation.
 
-## Active cleanup rule
+## Compatibility rule
 
-When the user asks to inventory or clean up, classify before committing:
+Do not collapse this repo into a generic template.
 
-- source / governance
-- generated / pack output
-- sensitive / patent / private
-- experimental / residue
-- unknown
+The lowercase `li/` layer governs the Workbench loop, Capture Back, packing, verification, handoff, and LLM/repo discipline. The existing IAM corpus governs the Augmented Agency thesis, ontology, architecture, and patent-sensitive claims.
 
-Do not recommend `git add -A` until the classification is explicit.
+If the two surfaces appear to conflict, stop and report the conflict.
 
-## Template update rule
+## Generated artifacts are evidence only
 
-Import Workbench template material as adapted repo-specific guidance unless a migration explicitly adopts the template's lowercase `li/` structure.
+Generated artifacts do not govern the repo. Examples include `dist/**`, `outputs/**`, generated packs, generated repo-history artifacts, generated summaries, generated diagrams, exported HTML/PDF/slides, and inventories.
 
-The important template insight currently being imported is:
+If generated evidence is wrong, repair the governing source, LI, prompt, tool, Makefile target, verifier, or test, then regenerate.
 
-```text
-Workbench converts accepted experience into Experiential Intelligence.
-Experiential Intelligence guides future Inference Infrastructure.
-Inference can visit. It does not own the house.
-```
+## Sensitive material rule
+
+Patent/provisional material and private conversation exports require explicit human approval before broad commit or sharing.
+
+## Handoff rule
+
+When finished, report:
+
+- governing files read
+- governing files changed
+- generated artifacts regenerated
+- commands/verifiers run
+- remaining conflicts or handoff notes

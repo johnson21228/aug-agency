@@ -1,180 +1,19 @@
-############################
-# macOS / Finder
-############################
 .DS_Store
-.AppleDouble
-.LSOverride
-
-############################
-# General editor / temp
-############################
-*.log
-*.tmp
-*.temp
-*.swp
-*.swo
-*.bak
-
-############################
-# Workspace / IDE noise
-############################
-.vscode/
-.idea/
-
-############################
-# Python / build artifacts
-############################
-__pycache__/
+__MACOSX/
 *.pyc
-*.pyo
-*.pyd
-.venv/
-.env/
-
-############################
-# IAM raw ingestion inputs
-# (never commit source materials)
-############################
-*chatgpt-export*.zip
-conversations.json
-*/chatgpt-export-*.zip
-
-############################
-# IAM databases (derived artifacts)
-############################
-iam.db
-provdb*.db
-subdb*.db
-
-############################
-# Local data directory
-# (inputs, inboxes, scratch)
-############################
-data/
-
-############################
-# Allow placeholders
-############################
-!.keep
-
-# Python virtualenv
-.venv/
-
-# Python caches
 __pycache__/
-*.pyc
 
-# Build / output artifacts
-dist/
-docs/
+# Generated packs
+dist/*.zip
 
-# OS noise
-.DS_Store
+# Generated history artifacts
+outputs/history/repo_history_for_llm_*.md
 
-spooler_outbox.db
-
-##################################
-# Build / Runtime Artifacts
-##################################
-dist/
-build/
-out/
-tmp/
-.cache/
-__pycache__/
-*.pyc
-*.log
-
-##################################
-# App / Runtime / Implementation
-##################################
-app/
-apps/
-runtime/
-src/
-Sources/
-ios/
-watch/
-macos/
-android/
-swift/
-xcode/
-*.xcodeproj
-*.xcworkspace
-DerivedData/
-
-##################################
-# Packaging / Binary Outputs
-##################################
-*.zip
-*.tar
-*.gz
-*.dmg
-*.pkg
-*.ipa
-
-##################################
-# Tooling / Dev Environments
-##################################
-.venv/
-env/
-node_modules/
-vendor/
-pip-wheel-metadata/
-
-##################################
-# Private / Local
-##################################
-.env
-.env.*
-*.key
-*.pem
-*.secret
-.private/
-.local/
-
-##################################
-# Data / Capture / IAM Substrate
-##################################
-iam.db
-*.sqlite
-*.sqlite3
-capture/
-spool/
-ingest/
-logs/
-
-##################################
-# Editors / OS
-##################################
-.DS_Store
-.idea/
-.vscode/
-*.swp
-
-# Repo-local hooks are not part of reasons-only surface
-.githooks/
-
-# reasons-only boundary: keep implementation/tooling out of the tracked surface
-code/
-config/
-ingestion-server/
-migrations/
-services/
-tools/
-
-# carve back in minimal pack tooling
-!tools/
-!tools/pack_md_repo.py
-!tools/pack_repo.py
-
-# Local/private patent drafting artifacts
-.DS_Store
-patent/.DS_Store
-patent/**/.DS_Store
-patent/Update_3_9_26/
-patent/provisional/DraftWitiamcherence.md
-patent/provisional/provisional2.pdf
+# Overlay cruft
+overlay/
+files/
+apply_*_overlay.py
+*_overlay.zip
 
 # Generated Workbench repo inventory snapshots
 artifacts/workbench_repo_inventory_*.md
